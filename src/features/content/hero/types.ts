@@ -19,7 +19,7 @@ export interface HeroSectionResponse {
 export interface HeroTopicInput {
   title: string
   description: string
-  image?: string
+  image?: string | undefined
   button: HeroTopicButton
 }
 
@@ -27,6 +27,6 @@ export type HeroSectionInput = HeroTopicInput[]
 
 export interface HeroSectionFormData {
   payload: HeroSectionInput
-  files?: Map<number, File>
-  alts?: Map<number, string>
+  files?: Map<number, File> | undefined
+  alts?: Map<number, string> | undefined
 }
