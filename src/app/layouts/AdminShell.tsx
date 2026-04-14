@@ -1,6 +1,8 @@
 import { Link, Outlet, useMatches } from '@tanstack/react-router'
 import {
+  ChevronDown,
   FileText,
+  Image,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -20,14 +22,16 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/shared/components/ui/sheet'
+import type { NavigationIcon, NavigationItem } from '@/shared/navigation'
 import { navigationItems } from '@/shared/navigation'
 import { cn } from '@/shared/lib/utils'
 
-const iconMap = {
+const iconMap: Record<NavigationIcon, typeof LayoutDashboard> = {
   'layout-dashboard': LayoutDashboard,
   'file-text': FileText,
+  'image': Image,
   users: Users,
-} as const
+}
 
 function getInitials(name: string): string {
   return name
@@ -38,8 +42,82 @@ function getInitials(name: string): string {
     .toUpperCase()
 }
 
+function NavLink({
+  to,
+  icon,
+  label,
+  onNavigate,
+  indent = false,
+}: {
+  to: string
+  icon: NavigationIcon
+  label: string
+  onNavigate?: () => void
+  indent?: boolean
+}) {
+  const Icon = iconMap[icon]
+  return (
+    <Link
+      to={to}
+      onClick={onNavigate}
+      activeOptions={{ exact: true }}
+      activeProps={{ className: 'bg-primary/10 text-primary font-semibold' }}
+      inactiveProps={{ className: 'text-muted-foreground hover:bg-accent hover:text-accent-foreground' }}
+      className={cn(
+        'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
+        indent && 'pl-9',
+      )}
+    >
+      <Icon className="size-4 shrink-0" />
+      {label}
+    </Link>
+  )
+}
+
+function NavGroup({
+  item,
+  currentPath,
+  onNavigate,
+}: {
+  item: NavigationItem
+  currentPath: string
+  onNavigate?: () => void
+}) {
+  const isActive = currentPath.startsWith(item.to)
+  const Icon = iconMap[item.icon]
+
+  return (
+    <Collapsible defaultOpen={isActive}>
+      <CollapsibleTrigger className={cn(
+        'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors',
+        isActive
+          ? 'text-primary font-semibold'
+          : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+      )}>
+        <Icon className="size-4 shrink-0" />
+        {item.label}
+        <ChevronDown className="ml-auto size-4 shrink-0 transition-transform duration-200 [[data-state=open]>&]:rotate-180" />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="flex flex-col gap-0.5 pt-0.5">
+        {item.children?.map((child) => (
+          <NavLink
+            key={child.to}
+            to={child.to}
+            icon={child.icon}
+            label={child.label}
+            onNavigate={onNavigate}
+            indent
+          />
+        ))}
+      </CollapsibleContent>
+    </Collapsible>
+  )
+}
+
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const { session, signOut } = useAuth()
+  const matches = useMatches()
+  const currentPath = matches[matches.length - 1]?.pathname ?? ''
   const userName = session?.user.name ?? 'Admin'
   const userEmail = session?.user.email ?? ''
   const userRole = session?.user.role ?? 'ADMIN'
@@ -53,22 +131,13 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       <Separator />
 
       <nav className="flex flex-1 flex-col gap-1 p-3">
-        {navigationItems.map((item) => {
-          const Icon = iconMap[item.icon]
-          return (
-            <Link
-              key={item.to}
-              to={item.to}
-              onClick={onNavigate}
-              activeProps={{ className: 'bg-primary/10 text-primary font-semibold' }}
-              inactiveProps={{ className: 'text-muted-foreground hover:bg-accent hover:text-accent-foreground' }}
-              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors"
-            >
-              <Icon className="size-4 shrink-0" />
-              {item.label}
-            </Link>
-          )
-        })}
+        {navigationItems.map((item) =>
+          item.children ? (
+            <NavGroup key={item.to} item={item} currentPath={currentPath} onNavigate={onNavigate} />
+          ) : (
+            <NavLink key={item.to} to={item.to} icon={item.icon} label={item.label} onNavigate={onNavigate} />
+          ),
+        )}
       </nav>
 
       <Separator />
@@ -108,6 +177,7 @@ function PageTitle() {
   const path = lastMatch?.pathname ?? ''
 
   if (path.startsWith('/dashboard')) return 'Visão geral'
+  if (path === '/conteudo/hero') return 'Hero'
   if (path.startsWith('/conteudo')) return 'Conteúdo'
   if (path.startsWith('/usuarios')) return 'Usuários'
   return 'Tessa Admin'

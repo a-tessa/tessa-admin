@@ -1,4 +1,4 @@
-import { apiRequest } from '@/shared/lib/api'
+import { authenticatedRequest } from '@/shared/lib/api'
 import type {
   CreateUserInput,
   CreateUserResponse,
@@ -9,39 +9,32 @@ import type {
 
 export async function fetchUsers(
   params: PaginationParams,
-  accessToken: string,
 ): Promise<FetchUsersResponse> {
   const search = new URLSearchParams({
     page: String(params.page),
     perPage: String(params.perPage),
   })
 
-  return apiRequest<FetchUsersResponse>(
+  return authenticatedRequest<FetchUsersResponse>(
     `/api/users?${search.toString()}`,
-    {},
-    accessToken,
   )
 }
 
 export async function createUser(
   input: CreateUserInput,
-  accessToken: string,
 ): Promise<CreateUserResponse> {
-  return apiRequest<CreateUserResponse>(
+  return authenticatedRequest<CreateUserResponse>(
     '/api/users',
     { method: 'POST', body: JSON.stringify(input) },
-    accessToken,
   )
 }
 
 export async function updateUserStatus(
   id: string,
   isActive: boolean,
-  accessToken: string,
 ): Promise<UpdateUserStatusResponse> {
-  return apiRequest<UpdateUserStatusResponse>(
+  return authenticatedRequest<UpdateUserStatusResponse>(
     `/api/users/${id}/status`,
     { method: 'PATCH', body: JSON.stringify({ isActive }) },
-    accessToken,
   )
 }

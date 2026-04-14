@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useAuth } from '@/features/auth/use-auth'
 import { updateUserStatus } from '../services/users.service'
+import { userKeys } from '../users.queries'
 
 interface ToggleUserStatusVariables {
   id: string
@@ -8,15 +8,11 @@ interface ToggleUserStatusVariables {
 }
 
 export function useToggleUserStatus() {
-  const { session } = useAuth()
   const queryClient = useQueryClient()
-  const accessToken = session?.accessToken ?? ''
 
   return useMutation({
     mutationFn: (variables: ToggleUserStatusVariables) =>
-      updateUserStatus(variables.id, variables.isActive, accessToken),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['users'] })
-    },
+      updateUserStatus(variables.id, variables.isActive),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: userKeys.all }),
   })
 }

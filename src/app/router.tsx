@@ -7,6 +7,7 @@ import {
 } from '@tanstack/react-router'
 import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
+import { HeroSectionPage } from '@/features/content/hero/pages/HeroSectionPage'
 import { ContentPageEditPage } from '@/features/content/pages/ContentPageEditPage'
 import { ContentPagesPage } from '@/features/content/pages/ContentPagesPage'
 import { DashboardPage } from '@/features/dashboard/pages/DashboardPage'
@@ -48,6 +49,12 @@ const contentRoute = createRoute({
   component: ContentPagesPage,
 })
 
+const contentHeroRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'conteudo/hero',
+  component: HeroSectionPage,
+})
+
 const contentEditRoute = createRoute({
   getParentRoute: () => appRoute,
   path: 'conteudo/$slug',
@@ -66,6 +73,7 @@ const routeTree = rootRoute.addChildren([
     indexRoute,
     dashboardRoute,
     contentRoute,
+    contentHeroRoute,
     contentEditRoute,
     usersRoute,
   ]),
