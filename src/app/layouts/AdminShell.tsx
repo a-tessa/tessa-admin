@@ -1,5 +1,6 @@
 import { Link, Outlet, useMatches } from '@tanstack/react-router'
 import {
+  Briefcase,
   ChevronDown,
   FileText,
   Image,
@@ -11,6 +12,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '@/features/auth/use-auth'
+import { PublishFloatingBar } from '@/features/content/publish'
 import { TessaLogo } from '@/shared/components/tessa-logo'
 import { Avatar, AvatarFallback } from '@/shared/components/ui/avatar'
 import { Badge } from '@/shared/components/ui/badge'
@@ -33,6 +35,7 @@ const iconMap: Record<NavigationIcon, typeof LayoutDashboard> = {
   'file-text': FileText,
   'image': Image,
   'tags': Tags,
+  'briefcase': Briefcase,
   users: Users,
 }
 
@@ -182,6 +185,7 @@ function PageTitle() {
   if (path.startsWith('/dashboard')) return 'Visão geral'
   if (path === '/conteudo/hero') return 'Seção Principal'
   if (path === '/conteudo/categorias') return 'Categorias'
+  if (path.startsWith('/conteudo/servicos')) return 'Serviços'
   if (path.startsWith('/conteudo')) return 'Conteúdo'
   if (path.startsWith('/usuarios')) return 'Usuários'
   return 'Tessa Admin'
@@ -218,9 +222,11 @@ export function AdminShell() {
           </h1>
         </header>
 
-        <main className={cn('flex-1 p-4 lg:p-6')}>
+        <main className={cn('flex-1 p-4 pb-20 lg:p-6 lg:pb-20')}>
           <Outlet />
         </main>
+
+        <PublishFloatingBar />
       </div>
     </div>
   )

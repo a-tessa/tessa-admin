@@ -11,6 +11,7 @@ import { CategoriesPage } from '@/features/content/categories/pages/CategoriesPa
 import { HeroSectionPage } from '@/features/content/hero/pages/HeroSectionPage'
 import { ContentPageEditPage } from '@/features/content/pages/ContentPageEditPage'
 import { ContentPagesPage } from '@/features/content/pages/ContentPagesPage'
+import { ServicesPage } from '@/features/content/services/pages/ServicesPage'
 import { DashboardPage } from '@/features/dashboard/pages/DashboardPage'
 import { UsersPage } from '@/features/users/pages/UsersPage'
 import { NotFoundPage } from '@/shared/pages/NotFoundPage'
@@ -62,6 +63,12 @@ const contentCategoriesRoute = createRoute({
   component: CategoriesPage,
 })
 
+const contentServicesRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'conteudo/servicos',
+  component: ServicesPage,
+})
+
 const contentEditRoute = createRoute({
   getParentRoute: () => appRoute,
   path: 'conteudo/$slug',
@@ -82,6 +89,7 @@ const routeTree = rootRoute.addChildren([
     contentRoute,
     contentHeroRoute,
     contentCategoriesRoute,
+    contentServicesRoute,
     contentEditRoute,
     usersRoute,
   ]),

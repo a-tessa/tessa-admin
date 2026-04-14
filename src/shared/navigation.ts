@@ -4,6 +4,7 @@ export type NavigationIcon =
   | 'users'
   | 'image'
   | 'tags'
+  | 'briefcase'
 
 export interface NavigationChild {
   readonly to: string
@@ -46,6 +47,11 @@ export const navigationItems = [
         to: '/conteudo/categorias',
         label: 'Categorias',
         icon: 'tags',
+      },
+      {
+        to: '/conteudo/servicos',
+        label: 'Serviços',
+        icon: 'briefcase',
       },
     ],
   },

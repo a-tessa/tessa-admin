@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { upsertContentPage } from '../services/content.service'
 import { contentKeys } from '../content.queries'
+import { adminContentKeys } from '../publish/publish.queries'
 import type { UpsertContentPageInput } from '../types'
 
 interface UpsertContentPageVariables {
@@ -19,6 +20,7 @@ export function useUpsertContentPage() {
       void queryClient.invalidateQueries({
         queryKey: contentKeys.detail(variables.slug),
       })
+      void queryClient.invalidateQueries({ queryKey: adminContentKeys.all })
     },
   })
 }

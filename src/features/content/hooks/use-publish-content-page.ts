@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { publishContentPage } from '../services/content.service'
 import { contentKeys } from '../content.queries'
+import { adminContentKeys } from '../publish/publish.queries'
 
 export function usePublishContentPage() {
   const queryClient = useQueryClient()
@@ -12,6 +13,7 @@ export function usePublishContentPage() {
       void queryClient.invalidateQueries({
         queryKey: contentKeys.detail(slug),
       })
+      void queryClient.invalidateQueries({ queryKey: adminContentKeys.all })
     },
   })
 }
