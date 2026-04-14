@@ -25,6 +25,7 @@ import {
 import type { NavigationIcon, NavigationItem } from '@/shared/navigation'
 import { navigationItems } from '@/shared/navigation'
 import { cn } from '@/shared/lib/utils'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/shared/components/ui/collapsible'
 
 const iconMap: Record<NavigationIcon, typeof LayoutDashboard> = {
   'layout-dashboard': LayoutDashboard,
@@ -52,8 +53,8 @@ function NavLink({
   to: string
   icon: NavigationIcon
   label: string
-  onNavigate?: () => void
-  indent?: boolean
+  onNavigate?: (() => void) | undefined
+  indent?: boolean | undefined
 }) {
   const Icon = iconMap[icon]
   return (
@@ -81,7 +82,7 @@ function NavGroup({
 }: {
   item: NavigationItem
   currentPath: string
-  onNavigate?: () => void
+  onNavigate?: (() => void) | undefined
 }) {
   const isActive = currentPath.startsWith(item.to)
   const Icon = iconMap[item.icon]
@@ -177,7 +178,7 @@ function PageTitle() {
   const path = lastMatch?.pathname ?? ''
 
   if (path.startsWith('/dashboard')) return 'Visão geral'
-  if (path === '/conteudo/hero') return 'Hero'
+  if (path === '/conteudo/hero') return 'Seção Principal'
   if (path.startsWith('/conteudo')) return 'Conteúdo'
   if (path.startsWith('/usuarios')) return 'Usuários'
   return 'Tessa Admin'
