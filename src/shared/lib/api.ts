@@ -1,4 +1,5 @@
 import { env } from '@/shared/config/env'
+import { readStoredAccessToken } from '@/features/auth/auth-storage'
 
 interface ApiErrorPayload {
   error?: string
@@ -60,4 +61,17 @@ export async function apiRequest<T>(
   }
 
   return (await response.json()) as T
+}
+
+export async function authenticatedRequest<T>(
+  path: string,
+  init: RequestInit = {},
+) {
+  const token = readStoredAccessToken()
+
+  if (!token) {
+    throw new ApiError('Sessão expirada. Faça login novamente.', 401)
+  }
+
+  return apiRequest<T>(path, init, token)
 }
