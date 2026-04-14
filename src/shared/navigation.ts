@@ -3,6 +3,7 @@ export type NavigationIcon =
   | 'file-text'
   | 'users'
   | 'image'
+  | 'tags'
 
 export interface NavigationChild {
   readonly to: string
@@ -40,6 +41,11 @@ export const navigationItems = [
         to: '/conteudo/hero',
         label: 'Seção Principal',
         icon: 'image',
+      },
+      {
+        to: '/conteudo/categorias',
+        label: 'Categorias',
+        icon: 'tags',
       },
     ],
   },

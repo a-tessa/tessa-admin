@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  Tags,
   Users,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -31,6 +32,7 @@ const iconMap: Record<NavigationIcon, typeof LayoutDashboard> = {
   'layout-dashboard': LayoutDashboard,
   'file-text': FileText,
   'image': Image,
+  'tags': Tags,
   users: Users,
 }
 
@@ -179,6 +181,7 @@ function PageTitle() {
 
   if (path.startsWith('/dashboard')) return 'Visão geral'
   if (path === '/conteudo/hero') return 'Seção Principal'
+  if (path === '/conteudo/categorias') return 'Categorias'
   if (path.startsWith('/conteudo')) return 'Conteúdo'
   if (path.startsWith('/usuarios')) return 'Usuários'
   return 'Tessa Admin'
