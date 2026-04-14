@@ -5,6 +5,7 @@ export type NavigationIcon =
   | 'image'
   | 'tags'
   | 'briefcase'
+  | 'layers'
 
 export interface NavigationChild {
   readonly to: string
@@ -52,6 +53,11 @@ export const navigationItems = [
         to: '/conteudo/servicos',
         label: 'Serviços',
         icon: 'briefcase',
+      },
+      {
+        to: '/conteudo/cenarios',
+        label: 'Cenários',
+        icon: 'layers',
       },
     ],
   },

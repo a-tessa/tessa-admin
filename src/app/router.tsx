@@ -11,6 +11,7 @@ import { CategoriesPage } from '@/features/content/categories/pages/CategoriesPa
 import { HeroSectionPage } from '@/features/content/hero/pages/HeroSectionPage'
 import { ContentPageEditPage } from '@/features/content/pages/ContentPageEditPage'
 import { ContentPagesPage } from '@/features/content/pages/ContentPagesPage'
+import { ScenerySectionPage } from '@/features/content/scenery/pages/ScenerySectionPage'
 import { ServicesPage } from '@/features/content/services/pages/ServicesPage'
 import { DashboardPage } from '@/features/dashboard/pages/DashboardPage'
 import { UsersPage } from '@/features/users/pages/UsersPage'
@@ -69,6 +70,12 @@ const contentServicesRoute = createRoute({
   component: ServicesPage,
 })
 
+const contentSceneryRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'conteudo/cenarios',
+  component: ScenerySectionPage,
+})
+
 const contentEditRoute = createRoute({
   getParentRoute: () => appRoute,
   path: 'conteudo/$slug',
@@ -90,6 +97,7 @@ const routeTree = rootRoute.addChildren([
     contentHeroRoute,
     contentCategoriesRoute,
     contentServicesRoute,
+    contentSceneryRoute,
     contentEditRoute,
     usersRoute,
   ]),

@@ -4,6 +4,7 @@ import {
   ChevronDown,
   FileText,
   Image,
+  Layers,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -36,6 +37,7 @@ const iconMap: Record<NavigationIcon, typeof LayoutDashboard> = {
   'image': Image,
   'tags': Tags,
   'briefcase': Briefcase,
+  'layers': Layers,
   users: Users,
 }
 
@@ -186,6 +188,7 @@ function PageTitle() {
   if (path === '/conteudo/hero') return 'Seção Principal'
   if (path === '/conteudo/categorias') return 'Categorias'
   if (path.startsWith('/conteudo/servicos')) return 'Serviços'
+  if (path === '/conteudo/cenarios') return 'Cenários'
   if (path.startsWith('/conteudo')) return 'Conteúdo'
   if (path.startsWith('/usuarios')) return 'Usuários'
   return 'Tessa Admin'
