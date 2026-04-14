@@ -38,7 +38,7 @@ export const navigationItems = [
       },
       {
         to: '/conteudo/hero',
-        label: 'Hero',
+        label: 'Seção Principal',
         icon: 'image',
       },
     ],
