@@ -50,7 +50,7 @@ import { Textarea } from '@/shared/components/ui/textarea'
 import { Separator } from '@/shared/components/ui/separator'
 import { cn } from '@/shared/lib/utils'
 import { useCategories } from '../../categories'
-import type { ServicePage, ServicePageFormData } from '../types'
+import type { ServicePage, ServicePageFormData, ServicePageFormPayload } from '../types'
 
 const ACCEPTED_IMAGE_TYPES = 'image/jpeg,image/png,image/webp,image/gif'
 const MAX_FILE_SIZE_BYTES = 4 * 1024 * 1024
@@ -87,10 +87,6 @@ function slugify(value: string): string {
 
 function ImagePreview({ src }: { src: string | undefined }) {
   const [hasError, setHasError] = useState(false)
-
-  useEffect(() => {
-    setHasError(false)
-  }, [src])
 
   if (!src || hasError) {
     return (
@@ -169,7 +165,7 @@ function SortableImageItem({
         </button>
 
         <div className="relative size-12 shrink-0 overflow-hidden rounded-md border bg-muted">
-          <ImagePreview src={previewSrc} />
+          <ImagePreview key={previewSrc ?? ''} src={previewSrc} />
         </div>
 
         <Badge variant="secondary" className="shrink-0 text-[10px] tabular-nums">
@@ -257,7 +253,7 @@ export function ServiceForm({
       subtitle: service?.subtitle ?? '',
       exampleVideoUrl: service?.exampleVideoUrl ?? '',
       backgroundImageUrl: service?.backgroundImageUrl ?? '',
-      images: service?.images?.length
+      images: service?.images.length
         ? service.images
         : [],
     },
@@ -297,7 +293,7 @@ export function ServiceForm({
       subtitle: service?.subtitle ?? '',
       exampleVideoUrl: service?.exampleVideoUrl ?? '',
       backgroundImageUrl: service?.backgroundImageUrl ?? '',
-      images: service?.images?.length
+      images: service?.images.length
         ? service.images
         : [],
     })
@@ -317,10 +313,10 @@ export function ServiceForm({
     const nextPreviews = new Map(galleryPreviews)
 
     for (let i = 0; i < filesToAssign.length; i++) {
-      const field = newFields[i]!
-      const file = filesToAssign[i]!
-      galleryFilesRef.current.set(field.id, file)
-      nextPreviews.set(field.id, URL.createObjectURL(file))
+      const field = newFields[i]
+      const file = filesToAssign[i]
+      galleryFilesRef.current.set(field?.id ?? '', file ?? {} as File)
+      nextPreviews.set(field?.id ?? '', URL.createObjectURL(file ?? {} as File))
     }
 
     setGalleryPreviews(nextPreviews)
@@ -329,8 +325,8 @@ export function ServiceForm({
   function getImagePreviewSrc(fieldId: string, index: number): string | undefined {
     const blobUrl = galleryPreviews.get(fieldId)
     if (blobUrl) return blobUrl
-    const existingUrl = service?.images?.[index]?.imgUrl
-    const currentUrl = form.getValues(`images.${index}.imgUrl`)
+    const existingUrl = service?.images[index]?.imgUrl
+    const currentUrl = form.getValues('images')[index]?.imgUrl
     return currentUrl ?? existingUrl
   }
 
@@ -372,9 +368,9 @@ export function ServiceForm({
     }
 
     pendingFilesRef.current.push(...validFiles)
-    for (const _ of validFiles) {
+    validFiles.forEach(() => {
       append({ imgUrl: '' })
-    }
+    })
 
     e.target.value = ''
   }
@@ -391,6 +387,7 @@ export function ServiceForm({
     })
     const index = fields.findIndex((f) => f.id === fieldId)
     if (index !== -1) {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       form.setValue(`images.${index}.imgUrl`, '', { shouldDirty: true })
     }
   }
@@ -443,15 +440,16 @@ export function ServiceForm({
     }
 
     let hasImageError = false
-    const imagesPayload: Array<{ imgUrl?: string }> = []
+    const imagesPayload: { imgUrl?: string }[] = []
     const galleryFiles = new Map<number, File>()
 
     for (let i = 0; i < fields.length; i++) {
-      const field = fields[i]!
-      const file = galleryFilesRef.current.get(field.id)
+      const field = fields[i]
+      const file = galleryFilesRef.current.get(field?.id ?? '')
       const imgUrl = values.images[i]?.imgUrl
 
       if (!file && (!imgUrl || imgUrl.length === 0)) {
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         form.setError(`images.${i}.imgUrl`, { message: 'Envie ou substitua esta imagem.' })
         hasImageError = true
         continue
@@ -461,25 +459,33 @@ export function ServiceForm({
         galleryFiles.set(i, file)
         imagesPayload.push({})
       } else {
-        imagesPayload.push({ imgUrl })
+        imagesPayload.push(imgUrl ? { imgUrl } : {})
       }
     }
 
     if (hasImageError) return
 
-    onSubmit({
-      payload: {
-        slug: values.slug,
-        title: values.title,
-        category: values.category,
-        subtitle: values.subtitle,
-        exampleVideoUrl: values.exampleVideoUrl,
-        backgroundImageUrl: hasBgFile ? undefined : values.backgroundImageUrl,
-        images: imagesPayload,
-      },
-      backgroundImage: bgFileRef.current,
-      galleryFiles: galleryFiles.size > 0 ? galleryFiles : undefined,
-    })
+    const payload: ServicePageFormPayload = {
+      slug: values.slug,
+      title: values.title,
+      category: values.category,
+      subtitle: values.subtitle,
+      exampleVideoUrl: values.exampleVideoUrl,
+      images: imagesPayload,
+    }
+    if (!hasBgFile) {
+      payload.backgroundImageUrl = values.backgroundImageUrl ?? ''
+    }
+
+    const formData: ServicePageFormData = { payload }
+    if (bgFileRef.current) {
+      formData.backgroundImage = bgFileRef.current
+    }
+    if (galleryFiles.size > 0) {
+      formData.galleryFiles = galleryFiles
+    }
+
+    onSubmit(formData)
   }
 
   const bgSrc = getBgPreviewSrc()
@@ -609,7 +615,7 @@ export function ServiceForm({
               <div className="space-y-2">
                 {bgSrc ? (
                   <div className="relative h-36 w-full max-w-sm overflow-hidden rounded-lg border bg-muted">
-                    <ImagePreview src={bgSrc} />
+                    <ImagePreview key={bgSrc} src={bgSrc} />
                   </div>
                 ) : (
                   <button
