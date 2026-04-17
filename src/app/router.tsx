@@ -8,6 +8,7 @@ import {
 import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { CategoriesPage } from '@/features/content/categories/pages/CategoriesPage'
+import { ClientsPage } from '@/features/content/clients/pages/ClientsPage'
 import { HeroSectionPage } from '@/features/content/hero/pages/HeroSectionPage'
 import { ContentPageEditPage } from '@/features/content/pages/ContentPageEditPage'
 import { ContentPagesPage } from '@/features/content/pages/ContentPagesPage'
@@ -76,6 +77,12 @@ const contentSceneryRoute = createRoute({
   component: ScenerySectionPage,
 })
 
+const contentClientsRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'conteudo/clientes',
+  component: ClientsPage,
+})
+
 const contentEditRoute = createRoute({
   getParentRoute: () => appRoute,
   path: 'conteudo/$slug',
@@ -98,6 +105,7 @@ const routeTree = rootRoute.addChildren([
     contentCategoriesRoute,
     contentServicesRoute,
     contentSceneryRoute,
+    contentClientsRoute,
     contentEditRoute,
     usersRoute,
   ]),

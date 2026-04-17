@@ -9,6 +9,7 @@ import {
   Plus,
   Trash2,
   Video,
+  X,
 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -16,7 +17,6 @@ import { useServices } from '../hooks/use-services'
 import { useCreateService } from '../hooks/use-create-service'
 import { useUpdateService } from '../hooks/use-update-service'
 import { useDeleteService } from '../hooks/use-delete-service'
-import { ServiceFormDialog } from '../components/ServiceFormDialog'
 import { ServiceForm } from '../components/ServiceForm'
 import type { ServicePage, ServicePageFormData } from '../types'
 import {
@@ -383,7 +383,17 @@ export function ServicesPage() {
   const deleteMutation = useDeleteService()
 
   const [createOpen, setCreateOpen] = useState(false)
+  const [createResetKey, setCreateResetKey] = useState(0)
   const [deletingService, setDeletingService] = useState<ServicePage | null>(null)
+
+  function handleOpenCreate() {
+    setCreateResetKey((k) => k + 1)
+    setCreateOpen(true)
+  }
+
+  function handleCloseCreate() {
+    setCreateOpen(false)
+  }
 
   const services = servicesQuery.data?.servicesPages
   const hasServices = services && services.length > 0
@@ -400,6 +410,14 @@ export function ServicesPage() {
       },
       onError: (error) => toast.error(error.message),
     })
+  }
+
+  function handleToggleCreate() {
+    if (createOpen) {
+      handleCloseCreate()
+    } else {
+      handleOpenCreate()
+    }
   }
 
   function handleUpdate(slug: string, data: ServicePageFormData) {
@@ -434,11 +452,58 @@ export function ServicesPage() {
           </p>
         </div>
 
-        <Button className="gap-2" onClick={() => setCreateOpen(true)} disabled={isMutating}>
-          <Plus className="size-4" />
-          Novo serviço
+        <Button
+          className="gap-2"
+          onClick={handleToggleCreate}
+          disabled={isMutating && !createOpen}
+          variant={createOpen ? 'secondary' : 'default'}
+        >
+          {createOpen ? (
+            <>
+              <X className="size-4" />
+              Fechar formulário
+            </>
+          ) : (
+            <>
+              <Plus className="size-4" />
+              Novo serviço
+            </>
+          )}
         </Button>
       </div>
+
+      {createOpen ? (
+        <Card className="border-primary/30 ring-2 ring-primary/10">
+          <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
+            <div className="space-y-1">
+              <CardTitle>Novo serviço</CardTitle>
+              <CardDescription>
+                Preencha os dados da nova página de serviço.
+              </CardDescription>
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              onClick={handleCloseCreate}
+              disabled={createMutation.isPending}
+              aria-label="Fechar formulário"
+            >
+              <X className="size-4" />
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <ServiceForm
+              formId="service-create-form"
+              isPending={createMutation.isPending}
+              submitLabel="Criar"
+              onSubmit={handleCreate}
+              onCancel={handleCloseCreate}
+              resetKey={createResetKey}
+            />
+          </CardContent>
+        </Card>
+      ) : null}
 
       {servicesQuery.isPending ? <ServicesSkeleton /> : null}
 
@@ -451,12 +516,12 @@ export function ServicesPage() {
         </Card>
       ) : null}
 
-      {servicesQuery.isSuccess && !hasServices ? (
+      {servicesQuery.isSuccess && !hasServices && !createOpen ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-3 py-12">
             <Briefcase className="size-10 text-muted-foreground" />
             <p className="text-muted-foreground">Nenhum serviço cadastrado.</p>
-            <Button className="mt-2 gap-2" onClick={() => setCreateOpen(true)}>
+            <Button className="mt-2 gap-2" onClick={handleOpenCreate}>
               <Plus className="size-4" />
               Criar serviço
             </Button>
@@ -482,13 +547,6 @@ export function ServicesPage() {
           </p>
         </div>
       ) : null}
-
-      <ServiceFormDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        isPending={createMutation.isPending}
-        onSubmit={handleCreate}
-      />
 
       <AlertDialog
         open={deletingService !== null}

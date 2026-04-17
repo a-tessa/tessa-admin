@@ -1,6 +1,55 @@
 import { useMemo } from 'react'
 import { useAdminContent } from './use-admin-content'
 
+/**
+ * Coleções que a API sanitiza no publish removendo `id` dos itens
+ * (ver tessa-api/src/modules/content/content.utils.ts#sanitizeContentForPublish).
+ * Precisamos ignorar esse `id` ao comparar draft vs published para não
+ * reportarmos falsamente que há alterações não publicadas.
+ */
+const ID_STRIPPED_COLLECTIONS = new Set([
+  'nps',
+  'representantsBase',
+  'categories',
+  'clients',
+])
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function stripIdFromItems(
+  items: unknown[],
+): Array<Record<string, unknown> | unknown> {
+  return items.map((item) => {
+    if (!isPlainObject(item)) return item
+    const { id: _id, ...rest } = item
+    return rest
+  })
+}
+
+function normalizeForCompare(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map((item) => normalizeForCompare(item))
+  }
+
+  if (!isPlainObject(value)) return value
+
+  const result: Record<string, unknown> = {}
+  for (const [key, raw] of Object.entries(value)) {
+    if (raw === undefined) continue
+
+    if (ID_STRIPPED_COLLECTIONS.has(key) && Array.isArray(raw)) {
+      result[key] = stripIdFromItems(raw).map((item) => normalizeForCompare(item))
+      continue
+    }
+
+    result[key] = normalizeForCompare(raw)
+  }
+
+  return result
+}
+
 function deepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true
   if (a === null || b === null) return false
@@ -39,7 +88,11 @@ export function useHasUnpublishedChanges(): UnpublishedChangesResult {
   const hasChanges = useMemo(() => {
     if (!data) return false
     if (!data.publishedContent) return true
-    return !deepEqual(data.content, data.publishedContent)
+
+    const normalizedDraft = normalizeForCompare(data.content)
+    const normalizedPublished = normalizeForCompare(data.publishedContent)
+
+    return !deepEqual(normalizedDraft, normalizedPublished)
   }, [data])
 
   return {

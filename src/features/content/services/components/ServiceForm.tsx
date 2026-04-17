@@ -8,10 +8,10 @@ import {
   type DragEndEvent,
 } from '@dnd-kit/core'
 import {
+  horizontalListSortingStrategy,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
-  verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -150,7 +150,7 @@ function SortableImageItem({
       ref={setNodeRef}
       style={style}
       className={cn(
-        'rounded-lg border bg-card',
+        'rounded-lg border bg-card max-w-120',
         isDragging && 'relative z-10 shadow-lg ring-2 ring-primary/20 opacity-90',
       )}
     >
@@ -611,7 +611,7 @@ export function ServiceForm({
           name="backgroundImageUrl"
           render={() => (
             <FormItem>
-              <FormLabel>Imagem de fundo</FormLabel>
+              <FormLabel>Imagem de topo da página</FormLabel>
               <div className="space-y-2">
                 {bgSrc ? (
                   <div className="relative h-36 w-full max-w-sm overflow-hidden rounded-lg border bg-muted">
@@ -711,9 +711,9 @@ export function ServiceForm({
             >
               <SortableContext
                 items={sortableIds}
-                strategy={verticalListSortingStrategy}
+                strategy={horizontalListSortingStrategy}
               >
-                <div className="space-y-2">
+                <div className="space-y-2 flex flex-wrap gap-2">
                   {fields.map((field, index) => (
                     <SortableImageItem
                       key={field.id}

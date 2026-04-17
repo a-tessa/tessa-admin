@@ -70,18 +70,15 @@ export function LoginPage() {
           }}
         />
 
-        <div className="pointer-events-none absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h1v1H0z\' fill=\'%23fff\'/%3E%3C/svg%3E")', backgroundSize: '40px 40px' }} />
+        <div className="pointer-events-none absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'120\' height=\'120\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h1v1H0z\' fill=\'%23fff\'/%3E%3C/svg%3E")', backgroundSize: '40px 40px' }} />
 
         <div className="relative flex h-full flex-col justify-between p-10 text-primary-foreground xl:p-16">
-          <TessaLogo className="h-7 text-white" />
+          <TessaLogo className="h-15 text-white" />
 
           <div className="max-w-lg">
             <h1 className="text-4xl font-semibold leading-[1.1] tracking-tight xl:text-5xl">
               Gerencie conteúdo e&nbsp;usuários em um só lugar.
             </h1>
-            <p className="mt-6 text-base leading-7 text-primary-foreground/70">
-              Painel administrativo conectado à API Tessa com autenticação JWT, fluxo draft/publish e controle de permissões MASTER&thinsp;/&thinsp;ADMIN.
-            </p>
           </div>
 
           <div className="flex items-center gap-8 text-sm text-primary-foreground/50">
@@ -153,15 +150,6 @@ export function LoginPage() {
               {isSubmitting ? 'Autenticando...' : 'Entrar'}
             </Button>
           </form>
-
-          <div className="rounded-lg border bg-muted/50 p-4">
-            <p className="text-xs font-medium text-foreground">Primeiro acesso?</p>
-            <ol className="mt-2 space-y-1 text-xs leading-5 text-muted-foreground">
-              <li>1. Suba a API em <code className="rounded bg-muted px-1.5 py-0.5 text-[11px] font-medium text-foreground">localhost:3002</code></li>
-              <li>2. Execute o bootstrap do usuário master</li>
-              <li>3. Faça login com as credenciais criadas</li>
-            </ol>
-          </div>
         </div>
       </div>
     </div>
