@@ -1,11 +1,81 @@
 import { authenticatedRequest } from '@/shared/lib/api'
 import type {
+  ServicePageAssetUploadResponse,
   ServicePageFormData,
+  ServicePageFormPayload,
+  ServicePageFormPayloadImage,
   ServicePageItemResponse,
   ServicePagesResponse,
 } from './types'
 
 const BASE_PATH = '/api/content/admin/services-pages'
+const ASSETS_PATH = `${BASE_PATH}/assets`
+
+async function uploadServicePageAsset(
+  slug: string,
+  file: File,
+  kind: 'background' | 'image',
+  index?: number,
+): Promise<ServicePageAssetUploadResponse> {
+  const formData = new FormData()
+  formData.append('slug', slug)
+  formData.append('kind', kind)
+  formData.append('file', file)
+  if (kind === 'image' && typeof index === 'number') {
+    formData.append('index', String(index))
+  }
+
+  return authenticatedRequest<ServicePageAssetUploadResponse>(ASSETS_PATH, {
+    method: 'POST',
+    body: formData,
+  })
+}
+
+async function resolveUploads(data: ServicePageFormData): Promise<ServicePageFormPayload> {
+  const payload: ServicePageFormPayload = {
+    ...data.payload,
+    images: data.payload.images.map((image) => ({ ...image })),
+  }
+
+  const uploads: Promise<void>[] = []
+
+  if (data.backgroundImage) {
+    uploads.push(
+      uploadServicePageAsset(payload.slug, data.backgroundImage, 'background').then((asset) => {
+        payload.backgroundImageUrl = asset.url
+        payload.backgroundImageMeta = {
+          pathname: asset.pathname,
+          mimeType: asset.mimeType,
+          sizeBytes: asset.sizeBytes,
+          originalFilename: asset.originalFilename,
+        }
+      }),
+    )
+  }
+
+  if (data.galleryFiles && data.galleryFiles.size > 0) {
+    for (const [index, file] of data.galleryFiles) {
+      uploads.push(
+        uploadServicePageAsset(payload.slug, file, 'image', index).then((asset) => {
+          const nextImage: ServicePageFormPayloadImage = {
+            imgUrl: asset.url,
+            meta: {
+              pathname: asset.pathname,
+              mimeType: asset.mimeType,
+              sizeBytes: asset.sizeBytes,
+              originalFilename: asset.originalFilename,
+            },
+          }
+          payload.images[index] = nextImage
+        }),
+      )
+    }
+  }
+
+  await Promise.all(uploads)
+
+  return payload
+}
 
 export async function fetchServices(): Promise<ServicePagesResponse> {
   return authenticatedRequest<ServicePagesResponse>(BASE_PATH)
@@ -15,40 +85,13 @@ export async function fetchService(slug: string): Promise<ServicePageItemRespons
   return authenticatedRequest<ServicePageItemResponse>(`${BASE_PATH}/${slug}`)
 }
 
-function hasFileUploads(data: ServicePageFormData): boolean {
-  return data.backgroundImage !== undefined || (data.galleryFiles !== undefined && data.galleryFiles.size > 0)
-}
-
-function buildMultipartBody(data: ServicePageFormData): FormData {
-  const formData = new FormData()
-  formData.append('payload', JSON.stringify(data.payload))
-
-  if (data.backgroundImage) {
-    formData.append('backgroundImage', data.backgroundImage)
-  }
-
-  if (data.galleryFiles) {
-    for (const [index, file] of data.galleryFiles) {
-      formData.append(`image_${String(index)}`, file)
-    }
-  }
-
-  return formData
-}
-
-function buildRequestBody(data: ServicePageFormData): FormData | string {
-  if (hasFileUploads(data)) {
-    return buildMultipartBody(data)
-  }
-  return JSON.stringify(data.payload)
-}
-
 export async function createService(
   data: ServicePageFormData,
 ): Promise<ServicePageItemResponse> {
+  const payload = await resolveUploads(data)
   return authenticatedRequest<ServicePageItemResponse>(BASE_PATH, {
     method: 'POST',
-    body: buildRequestBody(data),
+    body: JSON.stringify(payload),
   })
 }
 
@@ -56,14 +99,15 @@ export async function updateService(
   slug: string,
   data: ServicePageFormData,
 ): Promise<ServicePageItemResponse> {
+  const payload = await resolveUploads(data)
   return authenticatedRequest<ServicePageItemResponse>(`${BASE_PATH}/${slug}`, {
     method: 'PUT',
-    body: buildRequestBody(data),
+    body: JSON.stringify(payload),
   })
 }
 
 export async function deleteService(slug: string): Promise<void> {
-  await authenticatedRequest<void>(`${BASE_PATH}/${slug}`, {
+  await authenticatedRequest<undefined>(`${BASE_PATH}/${slug}`, {
     method: 'DELETE',
   })
 }
