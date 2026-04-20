@@ -9,6 +9,8 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  MessageSquareQuote,
+  ShieldCheck,
   Tags,
   Users,
 } from 'lucide-react'
@@ -40,6 +42,8 @@ const iconMap: Record<NavigationIcon, typeof LayoutDashboard> = {
   'briefcase': Briefcase,
   'layers': Layers,
   'building-2': Building2,
+  'shield-check': ShieldCheck,
+  'message-square-quote': MessageSquareQuote,
   users: Users,
 }
 
@@ -192,6 +196,8 @@ function PageTitle() {
   if (path.startsWith('/conteudo/servicos')) return 'Serviços'
   if (path === '/conteudo/cenarios') return 'Cenários'
   if (path.startsWith('/conteudo')) return 'Conteúdo'
+  if (path.startsWith('/moderacao/depoimentos')) return 'Depoimentos'
+  if (path.startsWith('/moderacao')) return 'Moderação'
   if (path.startsWith('/usuarios')) return 'Usuários'
   return 'Tessa Admin'
 }

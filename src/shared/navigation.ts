@@ -7,6 +7,8 @@ export type NavigationIcon =
   | 'briefcase'
   | 'layers'
   | 'building-2'
+  | 'shield-check'
+  | 'message-square-quote'
 
 export interface NavigationChild {
   readonly to: string
@@ -64,6 +66,19 @@ export const navigationItems = [
         to: '/conteudo/clientes',
         label: 'Clientes',
         icon: 'building-2',
+      },
+    ],
+  },
+  {
+    to: '/moderacao',
+    label: 'Moderação',
+    summary: 'Aprovar envios dos visitantes da landing.',
+    icon: 'shield-check',
+    children: [
+      {
+        to: '/moderacao/depoimentos',
+        label: 'Depoimentos',
+        icon: 'message-square-quote',
       },
     ],
   },

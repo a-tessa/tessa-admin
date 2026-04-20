@@ -15,6 +15,7 @@ import { ContentPagesPage } from '@/features/content/pages/ContentPagesPage'
 import { ScenerySectionPage } from '@/features/content/scenery/pages/ScenerySectionPage'
 import { ServicesPage } from '@/features/content/services/pages/ServicesPage'
 import { DashboardPage } from '@/features/dashboard/pages/DashboardPage'
+import { TestimonialsPage } from '@/features/moderation/testimonials/pages/TestimonialsPage'
 import { UsersPage } from '@/features/users/pages/UsersPage'
 import { NotFoundPage } from '@/shared/pages/NotFoundPage'
 
@@ -89,6 +90,12 @@ const contentEditRoute = createRoute({
   component: ContentPageEditPage,
 })
 
+const moderationTestimonialsRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'moderacao/depoimentos',
+  component: TestimonialsPage,
+})
+
 const usersRoute = createRoute({
   getParentRoute: () => appRoute,
   path: 'usuarios',
@@ -107,6 +114,7 @@ const routeTree = rootRoute.addChildren([
     contentSceneryRoute,
     contentClientsRoute,
     contentEditRoute,
+    moderationTestimonialsRoute,
     usersRoute,
   ]),
 ])
