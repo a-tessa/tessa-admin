@@ -9,6 +9,7 @@ export type NavigationIcon =
   | 'building-2'
   | 'shield-check'
   | 'message-square-quote'
+  | 'handshake'
 
 export interface NavigationChild {
   readonly to: string
@@ -66,6 +67,11 @@ export const navigationItems = [
         to: '/conteudo/clientes',
         label: 'Clientes',
         icon: 'building-2',
+      },
+      {
+        to: '/conteudo/representantes',
+        label: 'Representantes',
+        icon: 'handshake',
       },
     ],
   },

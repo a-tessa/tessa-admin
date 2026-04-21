@@ -12,6 +12,7 @@ import { ClientsPage } from '@/features/content/clients/pages/ClientsPage'
 import { HeroSectionPage } from '@/features/content/hero/pages/HeroSectionPage'
 import { ContentPageEditPage } from '@/features/content/pages/ContentPageEditPage'
 import { ContentPagesPage } from '@/features/content/pages/ContentPagesPage'
+import { RepresentantsPage } from '@/features/content/representants/pages/RepresentantsPage'
 import { ScenerySectionPage } from '@/features/content/scenery/pages/ScenerySectionPage'
 import { ServicesPage } from '@/features/content/services/pages/ServicesPage'
 import { DashboardPage } from '@/features/dashboard/pages/DashboardPage'
@@ -84,6 +85,12 @@ const contentClientsRoute = createRoute({
   component: ClientsPage,
 })
 
+const contentRepresentantsRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'conteudo/representantes',
+  component: RepresentantsPage,
+})
+
 const contentEditRoute = createRoute({
   getParentRoute: () => appRoute,
   path: 'conteudo/$slug',
@@ -113,6 +120,7 @@ const routeTree = rootRoute.addChildren([
     contentServicesRoute,
     contentSceneryRoute,
     contentClientsRoute,
+    contentRepresentantsRoute,
     contentEditRoute,
     moderationTestimonialsRoute,
     usersRoute,

@@ -4,6 +4,7 @@ import {
   Building2,
   ChevronDown,
   FileText,
+  Handshake,
   Image,
   Layers,
   LayoutDashboard,
@@ -44,6 +45,7 @@ const iconMap: Record<NavigationIcon, typeof LayoutDashboard> = {
   'building-2': Building2,
   'shield-check': ShieldCheck,
   'message-square-quote': MessageSquareQuote,
+  'handshake': Handshake,
   users: Users,
 }
 
@@ -195,6 +197,8 @@ function PageTitle() {
   if (path === '/conteudo/categorias') return 'Categorias'
   if (path.startsWith('/conteudo/servicos')) return 'Serviços'
   if (path === '/conteudo/cenarios') return 'Cenários'
+  if (path === '/conteudo/clientes') return 'Clientes'
+  if (path === '/conteudo/representantes') return 'Representantes'
   if (path.startsWith('/conteudo')) return 'Conteúdo'
   if (path.startsWith('/moderacao/depoimentos')) return 'Depoimentos'
   if (path.startsWith('/moderacao')) return 'Moderação'
