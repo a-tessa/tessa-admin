@@ -33,25 +33,21 @@ export const navigationItems = [
     icon: 'layout-dashboard',
   },
   {
+    to: '/conteudo/categorias',
+    label: 'Categorias dos serviços',
+    summary: 'Gestão de categorias de serviços.',
+    icon: 'tags',
+  },
+  {
     to: '/conteudo',
     label: 'Conteúdo',
     summary: 'Listar, editar e publicar páginas.',
     icon: 'file-text',
     children: [
       {
-        to: '/conteudo',
-        label: 'Páginas',
-        icon: 'file-text',
-      },
-      {
         to: '/conteudo/hero',
         label: 'Seção Principal',
         icon: 'image',
-      },
-      {
-        to: '/conteudo/categorias',
-        label: 'Categorias',
-        icon: 'tags',
       },
       {
         to: '/conteudo/servicos',

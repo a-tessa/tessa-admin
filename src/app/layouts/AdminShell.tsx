@@ -218,7 +218,7 @@ export function AdminShell() {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-card/80 px-4 backdrop-blur lg:px-6">
+        <header className="sticky top-0 z-30 flex h-16.5 items-center gap-4 border-b-2 bg-card/80 px-4 backdrop-blur lg:px-6">
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon-sm" className="lg:hidden">
