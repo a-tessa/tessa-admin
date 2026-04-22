@@ -1,7 +1,7 @@
 import type { ChangeEvent, SyntheticEvent } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { Navigate, useNavigate } from '@tanstack/react-router'
-import { KeyRound, Loader2 } from 'lucide-react'
+import { Eye, EyeOff, KeyRound, Loader2 } from 'lucide-react'
 import { startTransition, useState, useTransition } from 'react'
 import type { LoginCredentials } from '@/features/auth/types'
 import { useAuth } from '@/features/auth/use-auth'
@@ -20,6 +20,7 @@ export function LoginPage() {
   const navigate = useNavigate()
   const { signIn, status } = useAuth()
   const [credentials, setCredentials] = useState(initialCredentials)
+  const [showPassword, setShowPassword] = useState(false)
   const [isPending, startSubmitting] = useTransition()
   const signInMutation = useMutation({
     mutationFn: signIn,
@@ -75,18 +76,10 @@ export function LoginPage() {
         <div className="relative flex h-full flex-col justify-between p-10 text-primary-foreground xl:p-16">
           <TessaLogo className="h-15 text-white" />
 
-          <div className="max-w-lg">
+          <div className="max-w-lg my-auto mx-auto">
             <h1 className="text-4xl font-semibold leading-[1.1] tracking-tight xl:text-5xl">
               Gerencie conteúdo e&nbsp;usuários em um só lugar.
             </h1>
-          </div>
-
-          <div className="flex items-center gap-8 text-sm text-primary-foreground/50">
-            <span>JWT Auth</span>
-            <span className="size-1 rounded-full bg-primary-foreground/20" />
-            <span>Draft &rarr; Publish</span>
-            <span className="size-1 rounded-full bg-primary-foreground/20" />
-            <span>Role-based access</span>
           </div>
         </div>
       </div>
@@ -118,12 +111,29 @@ export function LoginPage() {
 
             <FloatingInput
               id="password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               label="Senha"
               value={credentials.password}
               onChange={handleInputChange('password')}
               autoComplete="current-password"
               required
+              endAdornment={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground hover:text-foreground"
+                  onClick={() => setShowPassword((current) => !current)}
+                  aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                  aria-pressed={showPassword}
+                >
+                  {showPassword ? (
+                    <EyeOff className="size-4" aria-hidden />
+                  ) : (
+                    <Eye className="size-4" aria-hidden />
+                  )}
+                </Button>
+              }
             />
 
             <div

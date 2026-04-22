@@ -3,6 +3,7 @@ import { cn } from '@/shared/lib/utils'
 
 interface FloatingInputProps extends React.ComponentProps<'input'> {
   label: string
+  endAdornment?: React.ReactNode
 }
 
 function FloatingInput({
@@ -11,6 +12,7 @@ function FloatingInput({
   className,
   type,
   value,
+  endAdornment,
   ...props
 }: FloatingInputProps) {
   const hasValue = typeof value === 'string' ? value.length > 0 : value !== undefined
@@ -25,6 +27,7 @@ function FloatingInput({
         placeholder=" "
         className={cn(
           'peer h-14 w-full min-w-0 rounded-lg border border-input bg-transparent px-4 pt-5 pb-2 text-base shadow-xs transition-[color,box-shadow,border-color] outline-none md:text-sm',
+          endAdornment && 'pr-11',
           'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
           'aria-invalid:border-destructive aria-invalid:ring-destructive/20',
           'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
@@ -45,6 +48,11 @@ function FloatingInput({
       >
         {label}
       </label>
+      {endAdornment ? (
+        <div className="pointer-events-none absolute inset-y-0 right-1 flex items-center">
+          <span className="pointer-events-auto inline-flex">{endAdornment}</span>
+        </div>
+      ) : null}
     </div>
   )
 }

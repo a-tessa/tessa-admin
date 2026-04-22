@@ -15,7 +15,6 @@ import { RepresentantFormDialog } from '../components/RepresentantFormDialog'
 import { BRAZILIAN_STATES, getStateName } from '../constants'
 import { useCreateRepresentant } from '../hooks/use-create-representant'
 import { useDeleteRepresentant } from '../hooks/use-delete-representant'
-import { useRepresentantSegments } from '../hooks/use-representant-segments'
 import { useRepresentants } from '../hooks/use-representants'
 import { useUpdateRepresentant } from '../hooks/use-update-representant'
 import type { Representant, RepresentantInput } from '../types'
@@ -61,12 +60,10 @@ import {
   TableRow,
 } from '@/shared/components/ui/table'
 
-const EMPTY_SEGMENTS: readonly string[] = []
 const ALL_STATES_VALUE = '__all__'
 
 export function RepresentantsPage() {
   const representantsQuery = useRepresentants()
-  const segmentsQuery = useRepresentantSegments()
   const createMutation = useCreateRepresentant()
   const updateMutation = useUpdateRepresentant()
   const deleteMutation = useDeleteRepresentant()
@@ -80,7 +77,6 @@ export function RepresentantsPage() {
   const [stateFilter, setStateFilter] = useState(ALL_STATES_VALUE)
 
   const representants = representantsQuery.data?.representantsBase
-  const segments = segmentsQuery.data?.segments ?? EMPTY_SEGMENTS
   const isMutating =
     createMutation.isPending ||
     updateMutation.isPending ||
@@ -394,7 +390,6 @@ export function RepresentantsPage() {
         open={formOpen}
         onOpenChange={setFormOpen}
         representant={editingRepresentant}
-        segments={segments}
         isPending={createMutation.isPending || updateMutation.isPending}
         onSubmit={handleFormSubmit}
       />
