@@ -226,7 +226,7 @@ export function HeroSectionPage() {
 
     const files = new Map<number, File>()
 
-    if (editingIndex !== null && heroSection) {
+    if (editingIndex !== null && hasHero) {
       const updatedTopics: HeroTopicInput[] = heroSection.map((t, i) =>
         i === editingIndex ? topicInput : { ...t },
       )
@@ -240,7 +240,7 @@ export function HeroSectionPage() {
         },
         onError: (error) => toast.error(error.message),
       })
-    } else if (heroSection) {
+    } else if (hasHero) {
       const newIndex = heroSection.length
       const updatedTopics: HeroTopicInput[] = [
         ...heroSection.map((t) => ({ ...t })),

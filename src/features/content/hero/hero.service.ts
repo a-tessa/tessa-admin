@@ -1,10 +1,18 @@
-import { authenticatedRequest } from '@/shared/lib/api'
+import { ApiError, authenticatedRequest } from '@/shared/lib/api'
 import type { HeroSectionFormData, HeroSectionResponse } from './types'
 
 const BASE_PATH = '/api/content/admin/hero-section'
 
 export async function fetchHeroSection(): Promise<HeroSectionResponse> {
-  return authenticatedRequest<HeroSectionResponse>(BASE_PATH)
+  try {
+    return await authenticatedRequest<HeroSectionResponse>(BASE_PATH)
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return { heroSection: [] }
+    }
+
+    throw error
+  }
 }
 
 function buildHeroFormData(data: HeroSectionFormData): FormData {
