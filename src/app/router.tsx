@@ -7,6 +7,9 @@ import {
 } from '@tanstack/react-router'
 import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
+import { BlogArticleCreatePage } from '@/features/content/blog/pages/BlogArticleCreatePage'
+import { BlogArticleEditPage } from '@/features/content/blog/pages/BlogArticleEditPage'
+import { BlogArticlesPage } from '@/features/content/blog/pages/BlogArticlesPage'
 import { CategoriesPage } from '@/features/content/categories/pages/CategoriesPage'
 import { ClientsPage } from '@/features/content/clients/pages/ClientsPage'
 import { HeroSectionPage } from '@/features/content/hero/pages/HeroSectionPage'
@@ -16,6 +19,7 @@ import { RepresentantsPage } from '@/features/content/representants/pages/Repres
 import { ScenerySectionPage } from '@/features/content/scenery/pages/ScenerySectionPage'
 import { ServicesPage } from '@/features/content/services/pages/ServicesPage'
 import { DashboardPage } from '@/features/dashboard/pages/DashboardPage'
+import { ContactsPage } from '@/features/moderation/contacts/pages/ContactsPage'
 import { TestimonialsPage } from '@/features/moderation/testimonials/pages/TestimonialsPage'
 import { UsersPage } from '@/features/users/pages/UsersPage'
 import { NotFoundPage } from '@/shared/pages/NotFoundPage'
@@ -91,10 +95,34 @@ const contentRepresentantsRoute = createRoute({
   component: RepresentantsPage,
 })
 
+const contentBlogRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'conteudo/blog',
+  component: BlogArticlesPage,
+})
+
+const contentBlogCreateRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'conteudo/blog/novo',
+  component: BlogArticleCreatePage,
+})
+
+const contentBlogEditRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'conteudo/blog/$slug',
+  component: BlogArticleEditPage,
+})
+
 const contentEditRoute = createRoute({
   getParentRoute: () => appRoute,
   path: 'conteudo/$slug',
   component: ContentPageEditPage,
+})
+
+const moderationContactsRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'moderacao/contatos',
+  component: ContactsPage,
 })
 
 const moderationTestimonialsRoute = createRoute({
@@ -121,7 +149,11 @@ const routeTree = rootRoute.addChildren([
     contentSceneryRoute,
     contentClientsRoute,
     contentRepresentantsRoute,
+    contentBlogRoute,
+    contentBlogCreateRoute,
+    contentBlogEditRoute,
     contentEditRoute,
+    moderationContactsRoute,
     moderationTestimonialsRoute,
     usersRoute,
   ]),

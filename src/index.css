@@ -2,6 +2,9 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/figtree";
+/* Faces itálicas: sem isso, `font-style: italic` não encontra a face e, com
+   `body { font-synthesis: none }`, o itálico praticamente some no navegador. */
+@import "@fontsource-variable/figtree/wght-italic.css";
 @import "@fontsource-variable/outfit";
 
 @custom-variant dark (&:is(.dark *));
@@ -132,6 +135,105 @@
   ::selection {
     background: oklch(0.53 0.12 163 / 0.24);
     color: oklch(0.145 0.015 286);
+  }
+}
+
+@layer components {
+  .blog-editor-content {
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: var(--foreground);
+  }
+
+  .blog-editor-content h1 {
+    font-size: 1.75rem;
+    line-height: 1.2;
+    font-weight: 700;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .blog-editor-content h2 {
+    font-size: 1.4rem;
+    line-height: 1.25;
+    font-weight: 700;
+    margin-top: 1.25rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .blog-editor-content h3 {
+    font-size: 1.15rem;
+    line-height: 1.3;
+    font-weight: 600;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .blog-editor-content p {
+    margin-top: 0.6rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .blog-editor-content p:first-child,
+  .blog-editor-content h1:first-child,
+  .blog-editor-content h2:first-child,
+  .blog-editor-content h3:first-child {
+    margin-top: 0;
+  }
+
+  .blog-editor-content ul {
+    list-style: disc;
+    padding-left: 1.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .blog-editor-content ol {
+    list-style: decimal;
+    padding-left: 1.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .blog-editor-content li {
+    margin-top: 0.2rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .blog-editor-content strong {
+    font-weight: 700;
+  }
+
+  .blog-editor-content em,
+  .blog-editor-content i {
+    font-style: italic;
+    /* Caso a face itálica ainda não carregue, permite síntese neste conteúdo. */
+    font-synthesis: style;
+  }
+
+  .blog-editor-content img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 1rem auto;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border);
+  }
+
+  .blog-editor-content blockquote {
+    border-left: 3px solid var(--border);
+    padding-left: 1rem;
+    margin: 0.75rem 0;
+    color: var(--muted-foreground);
+    font-style: italic;
+  }
+
+  .blog-editor-content .is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: var(--muted-foreground);
+    pointer-events: none;
+    height: 0;
   }
 }
 

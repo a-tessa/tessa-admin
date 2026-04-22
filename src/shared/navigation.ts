@@ -10,6 +10,8 @@ export type NavigationIcon =
   | 'shield-check'
   | 'message-square-quote'
   | 'handshake'
+  | 'newspaper'
+  | 'inbox'
 
 export interface NavigationChild {
   readonly to: string
@@ -69,6 +71,11 @@ export const navigationItems = [
         label: 'Representantes',
         icon: 'handshake',
       },
+      {
+        to: '/conteudo/blog',
+        label: 'Blog',
+        icon: 'newspaper',
+      },
     ],
   },
   {
@@ -77,6 +84,11 @@ export const navigationItems = [
     summary: 'Aprovar envios dos visitantes da landing.',
     icon: 'shield-check',
     children: [
+      {
+        to: '/moderacao/contatos',
+        label: 'Contatos',
+        icon: 'inbox',
+      },
       {
         to: '/moderacao/depoimentos',
         label: 'Depoimentos',

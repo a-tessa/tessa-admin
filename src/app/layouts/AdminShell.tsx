@@ -6,11 +6,13 @@ import {
   FileText,
   Handshake,
   Image,
+  Inbox,
   Layers,
   LayoutDashboard,
   LogOut,
   Menu,
   MessageSquareQuote,
+  Newspaper,
   ShieldCheck,
   Tags,
   Users,
@@ -46,6 +48,8 @@ const iconMap: Record<NavigationIcon, typeof LayoutDashboard> = {
   'shield-check': ShieldCheck,
   'message-square-quote': MessageSquareQuote,
   'handshake': Handshake,
+  'newspaper': Newspaper,
+  'inbox': Inbox,
   users: Users,
 }
 
@@ -199,6 +203,9 @@ function PageTitle() {
   if (path === '/conteudo/cenarios') return 'Cenários'
   if (path === '/conteudo/clientes') return 'Clientes'
   if (path === '/conteudo/representantes') return 'Representantes'
+  if (path === '/conteudo/blog/novo') return 'Novo artigo de blog'
+  if (path.startsWith('/conteudo/blog/')) return 'Editar artigo de blog'
+  if (path === '/conteudo/blog') return 'Blog'
   if (path.startsWith('/conteudo')) return 'Conteúdo'
   if (path.startsWith('/moderacao/depoimentos')) return 'Depoimentos'
   if (path.startsWith('/moderacao')) return 'Moderação'
