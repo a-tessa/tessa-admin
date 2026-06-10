@@ -3,6 +3,7 @@ import type {
   AdminBlogListParams,
   BlogArticleFormInput,
   BlogArticleResponse,
+  BlogArticleStatus,
   BlogArticlesListResponse,
   BlogBodyImageUploadResponse,
 } from './types'
@@ -83,6 +84,23 @@ export async function updateBlogArticle(
 export async function deleteBlogArticle(slug: string): Promise<void> {
   await authenticatedRequest<unknown>(`${BASE_PATH}/${slug}`, {
     method: 'DELETE',
+  })
+}
+
+export async function deleteBlogArticles(slugs: string[]): Promise<void> {
+  await Promise.all(slugs.map((slug) => deleteBlogArticle(slug)))
+}
+
+export async function updateBlogArticleStatus(
+  slug: string,
+  status: BlogArticleStatus,
+): Promise<BlogArticleResponse> {
+  const formData = new FormData()
+  formData.append('status', status)
+
+  return authenticatedRequest<BlogArticleResponse>(`${BASE_PATH}/${slug}`, {
+    method: 'PUT',
+    body: formData,
   })
 }
 

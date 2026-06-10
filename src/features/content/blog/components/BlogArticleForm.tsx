@@ -28,6 +28,7 @@ import {
   SelectValue,
 } from '@/shared/components/ui/select'
 import { Switch } from '@/shared/components/ui/switch'
+import { cn } from '@/shared/lib/utils'
 import type { BlogArticle, BlogArticleFormInput } from '../types'
 import { HeaderImageField } from './HeaderImageField'
 import { RichTextEditor } from './RichTextEditor'
@@ -372,7 +373,15 @@ export function BlogArticleForm({
           </aside>
         </div>
 
-        <div className="flex flex-wrap items-center justify-end gap-2 border-t pt-4">
+        <div className="h-14 shrink-0" aria-hidden />
+
+        <div
+          className={cn(
+            'fixed inset-x-0 bottom-0 z-40 flex flex-wrap items-center justify-end gap-2',
+            'border-t bg-card/95 px-4 py-3 shadow-[0_-2px_12px_0_oklch(0_0_0/0.06)] backdrop-blur-sm',
+            'lg:left-64 lg:px-6',
+          )}
+        >
           <Button
             type="button"
             variant="ghost"
