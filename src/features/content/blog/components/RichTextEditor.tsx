@@ -1,5 +1,6 @@
 import Image from '@tiptap/extension-image'
 import Placeholder from '@tiptap/extension-placeholder'
+import { Youtube } from '@tiptap/extension-youtube'
 import {
   EditorContent,
   useEditor,
@@ -14,16 +15,29 @@ import {
   Heading3,
   Image as ImageIcon,
   Italic,
+  Link2,
   List,
   Loader2,
+  MonitorPlay,
   Quote,
   Redo2,
   Undo2,
+  Unlink,
 } from 'lucide-react'
-import { useEffect, useId, useRef, type ReactNode } from 'react'
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import { useUploadBodyImage } from '../hooks/use-upload-body-image'
 import { Button } from '@/shared/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/shared/components/ui/dialog'
+import { Input } from '@/shared/components/ui/input'
+import { Label } from '@/shared/components/ui/label'
 import { Separator } from '@/shared/components/ui/separator'
 import { cn } from '@/shared/lib/utils'
 
@@ -74,11 +88,17 @@ function ToolbarButton({
 function Toolbar({
   editor,
   onPickImage,
+  onAddLink,
+  onRemoveLink,
+  onAddYoutube,
   disabled,
   isUploading,
 }: {
   editor: Editor
   onPickImage: () => void
+  onAddLink: () => void
+  onRemoveLink: () => void
+  onAddYoutube: () => void
   disabled: boolean
   isUploading: boolean
 }) {
@@ -90,6 +110,7 @@ function Toolbar({
     isH3,
     isBullet,
     isBlockquote,
+    isLink,
     canUndo,
     canRedo,
   } = useEditorState({
@@ -102,6 +123,7 @@ function Toolbar({
       isH3: e.isActive('heading', { level: 3 }),
       isBullet: e.isActive('bulletList'),
       isBlockquote: e.isActive('blockquote'),
+      isLink: e.isActive('link'),
       canUndo: e.can().undo(),
       canRedo: e.can().redo(),
     }),
@@ -186,6 +208,33 @@ function Toolbar({
         {isUploading ? <Loader2 className="animate-spin" /> : <ImageIcon />}
       </ToolbarButton>
 
+      <Separator orientation="vertical" className="mx-1 h-5" />
+
+      <ToolbarButton
+        onClick={onAddLink}
+        isActive={isLink}
+        disabled={disabled}
+        ariaLabel="Inserir ou editar link"
+      >
+        <Link2 />
+      </ToolbarButton>
+
+      <ToolbarButton
+        onClick={onRemoveLink}
+        disabled={disabled || !isLink}
+        ariaLabel="Remover link"
+      >
+        <Unlink />
+      </ToolbarButton>
+
+      <ToolbarButton
+        onClick={onAddYoutube}
+        disabled={disabled}
+        ariaLabel="Inserir vídeo do YouTube"
+      >
+        <MonitorPlay />
+      </ToolbarButton>
+
       <div className="ml-auto flex items-center gap-0.5">
         <ToolbarButton
           onClick={() => editor.chain().focus().undo().run()}
@@ -219,15 +268,37 @@ export function RichTextEditor({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const uploadMutation = useUploadBodyImage()
 
+  const [linkDialogOpen, setLinkDialogOpen] = useState(false)
+  const [linkHref, setLinkHref] = useState('')
+  const [linkLabel, setLinkLabel] = useState('')
+
+  const [youtubeDialogOpen, setYoutubeDialogOpen] = useState(false)
+  const [youtubeUrl, setYoutubeUrl] = useState('')
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
+        link: {
+          openOnClick: false,
+          autolink: true,
+          defaultProtocol: 'https',
+          HTMLAttributes: {
+            rel: 'noopener noreferrer nofollow',
+            target: '_blank',
+          },
+        },
       }),
       Image.configure({
         HTMLAttributes: {
           class: 'rounded-lg border border-border',
         },
+      }),
+      Youtube.configure({
+        controls: true,
+        nocookie: true,
+        width: 640,
+        height: 360,
       }),
       Placeholder.configure({ placeholder }),
     ],
@@ -280,6 +351,65 @@ export function RichTextEditor({
     })
   }
 
+  function handleOpenLinkDialog() {
+    if (editor.isActive('link')) {
+      editor.chain().focus().extendMarkRange('link').run()
+    }
+
+    const { from, to } = editor.state.selection
+    const selectedText = editor.state.doc.textBetween(from, to, ' ')
+    const linkAttrs = editor.getAttributes('link') as Record<string, unknown>
+    const hrefAttr = linkAttrs['href']
+    const currentHref = typeof hrefAttr === 'string' ? hrefAttr : ''
+
+    setLinkHref(currentHref)
+    setLinkLabel(selectedText)
+    setLinkDialogOpen(true)
+  }
+
+  function handleApplyLink() {
+    const href = linkHref.trim()
+    if (!href) return
+
+    const label = linkLabel.trim() || href
+
+    editor
+      .chain()
+      .focus()
+      .extendMarkRange('link')
+      .insertContent({
+        type: 'text',
+        text: label,
+        marks: [{ type: 'link', attrs: { href } }],
+      })
+      .run()
+
+    setLinkDialogOpen(false)
+  }
+
+  function handleRemoveLink() {
+    editor.chain().focus().extendMarkRange('link').unsetLink().run()
+  }
+
+  function handleOpenYoutubeDialog() {
+    setYoutubeUrl('')
+    setYoutubeDialogOpen(true)
+  }
+
+  function handleApplyYoutube() {
+    const src = youtubeUrl.trim()
+    if (!src) return
+
+    const inserted = editor.chain().focus().setYoutubeVideo({ src }).run()
+
+    if (!inserted) {
+      toast.error('Informe um link válido do YouTube.')
+      return
+    }
+
+    setYoutubeDialogOpen(false)
+  }
+
   return (
     <div
       className={cn(
@@ -291,6 +421,9 @@ export function RichTextEditor({
       <Toolbar
         editor={editor}
         onPickImage={handlePickImage}
+        onAddLink={handleOpenLinkDialog}
+        onRemoveLink={handleRemoveLink}
+        onAddYoutube={handleOpenYoutubeDialog}
         disabled={disabled}
         isUploading={uploadMutation.isPending}
       />
@@ -305,6 +438,112 @@ export function RichTextEditor({
         onChange={handleFileChange}
         disabled={disabled}
       />
+
+      <Dialog open={linkDialogOpen} onOpenChange={setLinkDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Inserir link</DialogTitle>
+            <DialogDescription>
+              Defina o texto exibido e o endereço para onde o link aponta.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="rich-text-link-label">Texto do link</Label>
+              <Input
+                id="rich-text-link-label"
+                value={linkLabel}
+                onChange={(event) => setLinkLabel(event.target.value)}
+                placeholder="Ex: Assista aqui"
+                autoComplete="off"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="rich-text-link-href">Endereço (URL)</Label>
+              <Input
+                id="rich-text-link-href"
+                type="url"
+                value={linkHref}
+                onChange={(event) => setLinkHref(event.target.value)}
+                placeholder="https://exemplo.com"
+                autoComplete="off"
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.preventDefault()
+                    handleApplyLink()
+                  }
+                }}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setLinkDialogOpen(false)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              onClick={handleApplyLink}
+              disabled={linkHref.trim().length === 0}
+            >
+              Aplicar link
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={youtubeDialogOpen} onOpenChange={setYoutubeDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Inserir vídeo do YouTube</DialogTitle>
+            <DialogDescription>
+              Cole o link do vídeo. Aceita formatos como youtube.com/watch?v=...,
+              youtu.be/... e youtube.com/shorts/...
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="rich-text-youtube-url">Link do vídeo</Label>
+            <Input
+              id="rich-text-youtube-url"
+              type="url"
+              value={youtubeUrl}
+              onChange={(event) => setYoutubeUrl(event.target.value)}
+              placeholder="https://www.youtube.com/watch?v=..."
+              autoComplete="off"
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault()
+                  handleApplyYoutube()
+                }
+              }}
+            />
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setYoutubeDialogOpen(false)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              onClick={handleApplyYoutube}
+              disabled={youtubeUrl.trim().length === 0}
+            >
+              Inserir vídeo
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

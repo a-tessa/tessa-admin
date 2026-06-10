@@ -47,6 +47,7 @@ import {
 } from '@/shared/components/ui/select'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Switch } from '@/shared/components/ui/switch'
+import { LocaleFlags } from '@/shared/components/locale-flag'
 import {
   Table,
   TableBody,
@@ -59,7 +60,7 @@ import { useAdminBlogArticles } from '../hooks/use-admin-blog-articles'
 import { useBulkDeleteBlogArticles } from '../hooks/use-bulk-delete-blog-articles'
 import { useDeleteBlogArticle } from '../hooks/use-delete-blog-article'
 import { useUpdateBlogArticleStatus } from '../hooks/use-update-blog-article-status'
-import type { BlogArticleListItem, BlogArticleStatus } from '../types'
+import type { BlogArticleAdminListItem, BlogArticleStatus } from '../types'
 
 const ALL_VALUE = '__all__'
 
@@ -88,7 +89,7 @@ export function BlogArticlesPage() {
   const [categoryFilter, setCategoryFilter] = useState(ALL_VALUE)
   const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(new Set())
   const [deletingArticle, setDeletingArticle] =
-    useState<BlogArticleListItem | null>(null)
+    useState<BlogArticleAdminListItem | null>(null)
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false)
 
   const articlesQuery = useAdminBlogArticles({
@@ -183,7 +184,7 @@ export function BlogArticlesPage() {
   }
 
   function handleToggleStatus(
-    article: BlogArticleListItem,
+    article: BlogArticleAdminListItem,
     nextStatus: BlogArticleStatus,
   ) {
     if (article.status === nextStatus) return
@@ -321,6 +322,7 @@ export function BlogArticlesPage() {
                 <TableHead className="w-10" />
                 <TableHead>Título</TableHead>
                 <TableHead>Categoria</TableHead>
+                <TableHead>Idiomas</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Autor</TableHead>
                 <TableHead>Atualizado</TableHead>
@@ -338,6 +340,9 @@ export function BlogArticlesPage() {
                   </TableCell>
                   <TableCell>
                     <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-16" />
                   </TableCell>
                   <TableCell>
                     <Skeleton className="h-4 w-20" />
@@ -403,6 +408,7 @@ export function BlogArticlesPage() {
                 </TableHead>
                 <TableHead>Título</TableHead>
                 <TableHead>Categoria</TableHead>
+                <TableHead>Idiomas</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Autor</TableHead>
                 <TableHead>Atualizado</TableHead>
@@ -453,6 +459,9 @@ export function BlogArticlesPage() {
                     <TableCell className="text-sm text-muted-foreground">
                       {categoryLabelBySlug.get(article.categorySlug) ??
                         article.categorySlug}
+                    </TableCell>
+                    <TableCell>
+                      <LocaleFlags locales={article.availableLocales} />
                     </TableCell>
                     <TableCell onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-2">

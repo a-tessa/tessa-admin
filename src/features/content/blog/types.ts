@@ -1,5 +1,7 @@
 export type BlogArticleStatus = 'draft' | 'published'
 
+export type ContentLocale = 'pt-BR' | 'en' | 'es'
+
 export interface BlogAuthor {
   id: string
   name: string
@@ -19,6 +21,10 @@ export interface BlogArticleListItem {
   author: BlogAuthor
 }
 
+export interface BlogArticleAdminListItem extends BlogArticleListItem {
+  availableLocales: ContentLocale[]
+}
+
 export interface BlogArticle extends BlogArticleListItem {
   content: string
 }
@@ -30,7 +36,7 @@ export interface BlogArticlePaginationMeta {
 }
 
 export interface BlogArticlesListResponse {
-  articles: BlogArticleListItem[]
+  articles: BlogArticleAdminListItem[]
   pagination: BlogArticlePaginationMeta
 }
 

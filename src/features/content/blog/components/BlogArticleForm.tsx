@@ -52,14 +52,31 @@ const ALLOWED_HTML_TAGS = [
   'img',
   'code',
   'pre',
+  'div',
+  'iframe',
 ]
 
-const ALLOWED_HTML_ATTR = ['href', 'src', 'alt', 'title', 'target', 'rel']
+const ALLOWED_HTML_ATTR = [
+  'href',
+  'src',
+  'alt',
+  'title',
+  'target',
+  'rel',
+  'width',
+  'height',
+  'frameborder',
+  'allow',
+  'allowfullscreen',
+  'data-youtube-video',
+]
 
 function sanitizeContent(html: string): string {
   return DOMPurify.sanitize(html, {
     ALLOWED_TAGS: ALLOWED_HTML_TAGS,
     ALLOWED_ATTR: ALLOWED_HTML_ATTR,
+    ADD_TAGS: ['iframe'],
+    ADD_ATTR: ['allowfullscreen', 'frameborder'],
   })
 }
 
