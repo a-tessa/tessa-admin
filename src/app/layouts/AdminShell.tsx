@@ -21,7 +21,7 @@ import { useState } from 'react'
 import { useAuth } from '@/features/auth/use-auth'
 import { PublishFloatingBar } from '@/features/content/publish'
 import { TessaLogo } from '@/shared/components/tessa-logo'
-import { Avatar, AvatarFallback } from '@/shared/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar'
 import { Badge } from '@/shared/components/ui/badge'
 import { Button } from '@/shared/components/ui/button'
 import { Separator } from '@/shared/components/ui/separator'
@@ -163,8 +163,15 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       <Separator />
 
       <div className="p-4">
-        <div className="flex items-center gap-3">
+        <Link
+          to="/perfil"
+          onClick={onNavigate}
+          className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-accent"
+        >
           <Avatar className="size-9">
+            {session?.user.avatarUrl ? (
+              <AvatarImage src={session.user.avatarUrl} alt={`Foto de ${userName}`} />
+            ) : null}
             <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
               {getInitials(userName)}
             </AvatarFallback>
@@ -176,7 +183,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           <Badge variant="secondary" className="shrink-0 text-[10px] uppercase tracking-wider">
             {userRole}
           </Badge>
-        </div>
+        </Link>
         <Button
           variant="ghost"
           size="sm"
@@ -210,6 +217,7 @@ function PageTitle() {
   if (path.startsWith('/moderacao/depoimentos')) return 'Depoimentos'
   if (path.startsWith('/moderacao')) return 'Moderação'
   if (path.startsWith('/usuarios')) return 'Usuários'
+  if (path.startsWith('/perfil')) return 'Meu perfil'
   return 'Tessa Admin'
 }
 

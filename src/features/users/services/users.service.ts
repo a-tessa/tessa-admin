@@ -4,6 +4,8 @@ import type {
   CreateUserResponse,
   FetchUsersResponse,
   PaginationParams,
+  UpdateUserInput,
+  UpdateUserResponse,
   UpdateUserStatusResponse,
 } from '../types'
 
@@ -37,4 +39,39 @@ export async function updateUserStatus(
     `/api/users/${id}/status`,
     { method: 'PATCH', body: JSON.stringify({ isActive }) },
   )
+}
+
+export async function updateUser(
+  id: string,
+  input: UpdateUserInput,
+): Promise<UpdateUserResponse> {
+  const hasAvatar = input.avatar instanceof File
+  const hasRemoveAvatar = input.removeAvatar === true
+
+  if (hasAvatar || hasRemoveAvatar) {
+    const formData = new FormData()
+    formData.append('name', input.name)
+    formData.append('email', input.email)
+
+    if (hasAvatar) {
+      formData.append('avatar', input.avatar ?? '')
+    }
+
+    if (hasRemoveAvatar) {
+      formData.append('removeAvatar', 'true')
+    }
+
+    return authenticatedRequest<UpdateUserResponse>(`/api/users/${id}`, {
+      method: 'PATCH',
+      body: formData,
+    })
+  }
+
+  return authenticatedRequest<UpdateUserResponse>(`/api/users/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      name: input.name,
+      email: input.email,
+    }),
+  })
 }

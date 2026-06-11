@@ -5,6 +5,7 @@ export interface User {
   name: string
   email: string
   role: UserRole
+  avatarUrl: string | null
   isActive: boolean
   createdAt: string
   updatedAt: string
@@ -38,5 +39,16 @@ export interface CreateUserResponse {
 }
 
 export interface UpdateUserStatusResponse {
+  user: User
+}
+
+export interface UpdateUserInput {
+  name: string
+  email: string
+  avatar?: File | null
+  removeAvatar?: boolean
+}
+
+export interface UpdateUserResponse {
   user: User
 }

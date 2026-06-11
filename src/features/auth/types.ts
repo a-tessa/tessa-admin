@@ -5,6 +5,7 @@ export interface AuthUser {
   name: string
   email: string
   role: UserRole
+  avatarUrl?: string | null
   isActive?: boolean
   createdAt?: string
   updatedAt?: string
@@ -36,4 +37,6 @@ export interface AuthContextValue {
   session: AuthSession | null
   signIn: (credentials: LoginCredentials) => Promise<AuthUser>
   signOut: () => void
+  refreshUser: () => Promise<AuthUser | null>
+  updateSessionUser: (user: AuthUser) => void
 }

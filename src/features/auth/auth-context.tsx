@@ -80,6 +80,46 @@ export function AuthProvider({ children }: PropsWithChildren) {
     setStatus('anonymous')
   }
 
+  async function refreshUser() {
+    const accessToken = readStoredAccessToken()
+
+    if (!accessToken) {
+      setSession(null)
+      setStatus('anonymous')
+      return null
+    }
+
+    const response = await getCurrentUser(accessToken)
+
+    if (!response.user) {
+      clearStoredAccessToken()
+      setSession(null)
+      setStatus('anonymous')
+      return null
+    }
+
+    setSession({
+      accessToken,
+      user: response.user,
+    })
+    setStatus('authenticated')
+
+    return response.user
+  }
+
+  function updateSessionUser(user: AuthSession['user']) {
+    setSession((current) => {
+      if (!current) {
+        return current
+      }
+
+      return {
+        ...current,
+        user,
+      }
+    })
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -87,6 +127,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
         session,
         signIn,
         signOut,
+        refreshUser,
+        updateSessionUser,
       }}
     >
       {children}

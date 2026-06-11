@@ -21,6 +21,7 @@ import { ServicesPage } from '@/features/content/services/pages/ServicesPage'
 import { DashboardPage } from '@/features/dashboard/pages/DashboardPage'
 import { ContactsPage } from '@/features/moderation/contacts/pages/ContactsPage'
 import { TestimonialsPage } from '@/features/moderation/testimonials/pages/TestimonialsPage'
+import { ProfilePage } from '@/features/profile/pages/ProfilePage'
 import { UsersPage } from '@/features/users/pages/UsersPage'
 import { NotFoundPage } from '@/shared/pages/NotFoundPage'
 
@@ -137,6 +138,12 @@ const usersRoute = createRoute({
   component: UsersPage,
 })
 
+const profileRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'perfil',
+  component: ProfilePage,
+})
+
 const routeTree = rootRoute.addChildren([
   loginRoute,
   appRoute.addChildren([
@@ -156,6 +163,7 @@ const routeTree = rootRoute.addChildren([
     moderationContactsRoute,
     moderationTestimonialsRoute,
     usersRoute,
+    profileRoute,
   ]),
 ])
 

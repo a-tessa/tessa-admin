@@ -1,14 +1,18 @@
-import { Loader2, Plus, ShieldCheck, UserPlus, Users } from 'lucide-react'
+import { Loader2, Pencil, Plus, ShieldCheck, UserPlus, Users } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useAuth } from '@/features/auth/use-auth'
+import { UserEditDialog, type UserEditSubmitData } from '@/features/users/components/UserEditDialog'
 import { useCreateUser } from '@/features/users/hooks/use-create-user'
 import { useToggleUserStatus } from '@/features/users/hooks/use-toggle-user-status'
+import { useUpdateUser } from '@/features/users/hooks/use-update-user'
 import { useUsers } from '@/features/users/hooks/use-users'
+import type { User } from '@/features/users/types'
 import type { UserRole } from '@/features/auth/types'
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar'
 import { Badge } from '@/shared/components/ui/badge'
 import { Button } from '@/shared/components/ui/button'
 import {
@@ -54,14 +58,26 @@ const createUserSchema = z.object({
 
 type CreateUserFormValues = z.infer<typeof createUserSchema>
 
+function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase()
+}
+
 export function UsersPage() {
-  const { session } = useAuth()
+  const { session, updateSessionUser } = useAuth()
   const [page, setPage] = useState(1)
   const perPage = 20
   const usersQuery = useUsers(page, perPage)
   const createMutation = useCreateUser()
+  const updateMutation = useUpdateUser()
   const toggleStatusMutation = useToggleUserStatus()
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [editingUser, setEditingUser] = useState<User | null>(null)
   const isMaster = session?.user.role === 'MASTER'
 
   const form = useForm<CreateUserFormValues>({
@@ -80,6 +96,45 @@ export function UsersPage() {
         toast.error(error.message)
       },
     })
+  }
+
+  function handleOpenEdit(user: User) {
+    setEditingUser(user)
+    setEditDialogOpen(true)
+  }
+
+  function handleEditUser(data: UserEditSubmitData) {
+    if (!editingUser) return
+
+    updateMutation.mutate(
+      {
+        id: editingUser.id,
+        input: {
+          name: data.name,
+          email: data.email,
+          avatar: data.avatar,
+          removeAvatar: data.removeAvatar,
+        },
+      },
+      {
+        onSuccess: (response) => {
+          if (session?.user.id === response.user.id) {
+            updateSessionUser({
+              ...session.user,
+              name: response.user.name,
+              email: response.user.email,
+              avatarUrl: response.user.avatarUrl,
+            })
+          }
+          toast.success('Usuário atualizado com sucesso.')
+          setEditDialogOpen(false)
+          setEditingUser(null)
+        },
+        onError: (error) => {
+          toast.error(error.message)
+        },
+      },
+    )
   }
 
   function handleToggleStatus(userId: string, currentActive: boolean) {
@@ -192,17 +247,29 @@ export function UsersPage() {
             </Form>
           </DialogContent>
         </Dialog>
+
+        <UserEditDialog
+          open={editDialogOpen}
+          onOpenChange={(open) => {
+            setEditDialogOpen(open)
+            if (!open) setEditingUser(null)
+          }}
+          user={editingUser}
+          isPending={updateMutation.isPending}
+          onSubmit={handleEditUser}
+        />
       </div>
 
       <div className="rounded-lg border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Nome</TableHead>
+              <TableHead>Usuário</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Papel</TableHead>
               <TableHead>Ativo</TableHead>
               <TableHead>Criado em</TableHead>
+              <TableHead className="w-24 text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -220,7 +287,7 @@ export function UsersPage() {
 
             {usersQuery.isSuccess && usersQuery.data.users.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-32 text-center">
+                <TableCell colSpan={6} className="h-32 text-center">
                   <div className="flex flex-col items-center gap-2 text-muted-foreground">
                     <Users className="size-8" />
                     <p>Nenhum usuário encontrado.</p>
@@ -234,7 +301,19 @@ export function UsersPage() {
               const isMasterUser = user.role === 'MASTER'
               return (
                 <TableRow key={user.id}>
-                  <TableCell className="font-medium">{user.name}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <Avatar className="size-8">
+                        {user.avatarUrl ? (
+                          <AvatarImage src={user.avatarUrl} alt={`Foto de ${user.name}`} />
+                        ) : null}
+                        <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
+                          {getInitials(user.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="font-medium">{user.name}</span>
+                    </div>
+                  </TableCell>
                   <TableCell className="text-muted-foreground">{user.email}</TableCell>
                   <TableCell>
                     <Badge variant={roleConfig.variant}>{roleConfig.label}</Badge>
@@ -249,6 +328,17 @@ export function UsersPage() {
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
                     {formatDateTime(user.createdAt)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="gap-2"
+                      onClick={() => handleOpenEdit(user)}
+                    >
+                      <Pencil className="size-4" />
+                      Editar
+                    </Button>
                   </TableCell>
                 </TableRow>
               )
