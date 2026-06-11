@@ -1,0 +1,2 @@
+export const HERO_TITLE_MAX_LENGTH = 25
+export const HERO_DESCRIPTION_MAX_LENGTH = 60

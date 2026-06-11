@@ -23,10 +23,28 @@ import {
 import { Input } from '@/shared/components/ui/input'
 import { Textarea } from '@/shared/components/ui/textarea'
 import type { HeroTopic } from '../types'
+import {
+  HERO_DESCRIPTION_MAX_LENGTH,
+  HERO_TITLE_MAX_LENGTH,
+} from '../constants'
 
 const heroTopicFormSchema = z.object({
-  title: z.string().trim().min(1, 'Título é obrigatório.'),
-  description: z.string().trim().min(1, 'Descrição é obrigatória.'),
+  title: z
+    .string()
+    .trim()
+    .min(1, 'Título é obrigatório.')
+    .max(
+      HERO_TITLE_MAX_LENGTH,
+      `Título deve ter no máximo ${HERO_TITLE_MAX_LENGTH} caracteres.`,
+    ),
+  description: z
+    .string()
+    .trim()
+    .min(1, 'Descrição é obrigatória.')
+    .max(
+      HERO_DESCRIPTION_MAX_LENGTH,
+      `Descrição deve ter no máximo ${HERO_DESCRIPTION_MAX_LENGTH} caracteres.`,
+    ),
   buttonText: z.string().trim().min(1, 'Texto do botão é obrigatório.'),
   buttonUrl: z.string().trim().min(1, 'URL do botão é obrigatória.'),
 })
@@ -195,9 +213,18 @@ export function HeroTopicEditDialog({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Título</FormLabel>
+                  <FormLabel>
+                    Título{' '}
+                    <span className="font-normal text-muted-foreground">
+                      (máx. {HERO_TITLE_MAX_LENGTH} caracteres)
+                    </span>
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="Ex: Transforme seu negócio" {...field} />
+                    <Input
+                      placeholder="Ex: Transforme seu negócio"
+                      maxLength={HERO_TITLE_MAX_LENGTH}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -209,11 +236,17 @@ export function HeroTopicEditDialog({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Descrição</FormLabel>
+                  <FormLabel>
+                    Descrição{' '}
+                    <span className="font-normal text-muted-foreground">
+                      (máx. {HERO_DESCRIPTION_MAX_LENGTH} caracteres)
+                    </span>
+                  </FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Texto descritivo do tópico..."
                       rows={3}
+                      maxLength={HERO_DESCRIPTION_MAX_LENGTH}
                       {...field}
                     />
                   </FormControl>
