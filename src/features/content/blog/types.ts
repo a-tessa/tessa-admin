@@ -33,6 +33,7 @@ export interface BlogArticlePaginationMeta {
   page: number
   perPage: number
   total: number
+  totalPages: number
 }
 
 export interface BlogArticlesListResponse {

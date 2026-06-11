@@ -85,6 +85,8 @@ function ToolbarButton({
   )
 }
 
+const ADMIN_HEADER_OFFSET_PX = 66
+
 function Toolbar({
   editor,
   onPickImage,
@@ -353,7 +355,7 @@ export function RichTextEditor({
       },
       {
         threshold: [0],
-        rootMargin: '-4.125rem 0px 0px 0px',
+        rootMargin: `-${ADMIN_HEADER_OFFSET_PX}px 0px 0px 0px`,
       },
     )
 

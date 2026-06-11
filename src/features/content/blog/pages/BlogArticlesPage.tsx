@@ -63,6 +63,7 @@ import { useUpdateBlogArticleStatus } from '../hooks/use-update-blog-article-sta
 import type { BlogArticleAdminListItem, BlogArticleStatus } from '../types'
 
 const ALL_VALUE = '__all__'
+const PER_PAGE = 20
 
 type StatusFilterValue = BlogArticleStatus | typeof ALL_VALUE
 
@@ -85,6 +86,7 @@ function formatUpdatedAt(iso: string): string {
 
 export function BlogArticlesPage() {
   const navigate = useNavigate()
+  const [page, setPage] = useState(1)
   const [statusFilter, setStatusFilter] = useState<StatusFilterValue>(ALL_VALUE)
   const [categoryFilter, setCategoryFilter] = useState(ALL_VALUE)
   const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(new Set())
@@ -93,9 +95,10 @@ export function BlogArticlesPage() {
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false)
 
   const articlesQuery = useAdminBlogArticles({
+    page,
+    perPage: PER_PAGE,
     ...(statusFilter !== ALL_VALUE ? { status: statusFilter } : {}),
     ...(categoryFilter !== ALL_VALUE ? { categorySlug: categoryFilter } : {}),
-    perPage: 50,
   })
   const categoriesQuery = useQuery(categoriesListQuery())
   const deleteMutation = useDeleteBlogArticle()
@@ -103,7 +106,7 @@ export function BlogArticlesPage() {
   const statusMutation = useUpdateBlogArticleStatus()
 
   const articles = articlesQuery.data?.articles ?? []
-  const total = articlesQuery.data?.pagination.total ?? 0
+  const pagination = articlesQuery.data?.pagination
 
   const categoryLabelBySlug = useMemo(() => {
     const map = new Map<string, string>()
@@ -127,6 +130,7 @@ export function BlogArticlesPage() {
 
   useEffect(() => {
     setSelectedSlugs(new Set())
+    setPage(1)
   }, [statusFilter, categoryFilter])
 
   function toggleArticleSelection(slug: string, checked: boolean) {
@@ -554,11 +558,50 @@ export function BlogArticlesPage() {
             </TableBody>
           </Table>
 
-          <div className="border-t px-4 py-3">
-            <p className="text-sm text-muted-foreground">
-              {`${String(articles.length)} de ${String(total)} artigo(s)`}
-            </p>
-          </div>
+          {pagination && pagination.totalPages > 1 ? (
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t px-4 py-3">
+              <p className="text-sm text-muted-foreground">
+                {String(pagination.total)} artigo(s) no total
+              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page <= 1}
+                  onClick={() => setPage(1)}
+                >
+                  Primeira
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => p - 1)}
+                >
+                  Anterior
+                </Button>
+                <p className="min-w-28 text-center text-sm text-muted-foreground">
+                  Página {String(page)} de {String(pagination.totalPages)}
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page >= pagination.totalPages}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  Próxima
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page >= pagination.totalPages}
+                  onClick={() => setPage(pagination.totalPages)}
+                >
+                  Última
+                </Button>
+              </div>
+            </div>
+          ) : null}
         </div>
       ) : null}
 
