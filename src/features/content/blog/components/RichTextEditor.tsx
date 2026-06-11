@@ -93,6 +93,7 @@ function Toolbar({
   onAddYoutube,
   disabled,
   isUploading,
+  isFloating = false,
 }: {
   editor: Editor
   onPickImage: () => void
@@ -101,6 +102,7 @@ function Toolbar({
   onAddYoutube: () => void
   disabled: boolean
   isUploading: boolean
+  isFloating?: boolean
 }) {
   const {
     isBold,
@@ -130,7 +132,12 @@ function Toolbar({
   })
 
   return (
-    <div className="sticky top-0 z-10 flex flex-wrap items-center gap-0.5 border-b bg-muted/30 px-2 py-1.5 backdrop-blur">
+    <div
+      className={cn(
+        'sticky top-16.5 z-20 flex flex-wrap items-center gap-0.5 rounded-t-lg border-b bg-card/95 px-2 py-1.5 backdrop-blur supports-backdrop-filter:bg-card/80',
+        isFloating && 'rounded-t-none shadow-sm ring-1 ring-border/40',
+      )}
+    >
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleBold().run()}
         isActive={isBold}
@@ -266,11 +273,13 @@ export function RichTextEditor({
 }: RichTextEditorProps) {
   const inputId = useId()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const toolbarSentinelRef = useRef<HTMLDivElement>(null)
   const uploadMutation = useUploadBodyImage()
 
   const [linkDialogOpen, setLinkDialogOpen] = useState(false)
   const [linkHref, setLinkHref] = useState('')
   const [linkLabel, setLinkLabel] = useState('')
+  const [isToolbarFloating, setIsToolbarFloating] = useState(false)
 
   const [youtubeDialogOpen, setYoutubeDialogOpen] = useState(false)
   const [youtubeUrl, setYoutubeUrl] = useState('')
@@ -331,6 +340,26 @@ export function RichTextEditor({
   useEffect(() => {
     editor.setEditable(!disabled)
   }, [editor, disabled])
+
+  useEffect(() => {
+    const sentinel = toolbarSentinelRef.current
+    if (!sentinel) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsToolbarFloating(entry ? !entry.isIntersecting : false)
+      },
+      {
+        threshold: [0],
+        rootMargin: '-4.125rem 0px 0px 0px',
+      },
+    )
+
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [])
 
   function handlePickImage() {
     fileInputRef.current?.click()
@@ -413,11 +442,17 @@ export function RichTextEditor({
   return (
     <div
       className={cn(
-        'overflow-hidden rounded-lg border bg-card',
+        'rounded-lg border bg-card',
         ariaInvalid && 'border-destructive ring-2 ring-destructive/20',
         className,
       )}
     >
+      <div
+        ref={toolbarSentinelRef}
+        className="pointer-events-none h-px w-full"
+        aria-hidden
+      />
+
       <Toolbar
         editor={editor}
         onPickImage={handlePickImage}
@@ -426,9 +461,12 @@ export function RichTextEditor({
         onAddYoutube={handleOpenYoutubeDialog}
         disabled={disabled}
         isUploading={uploadMutation.isPending}
+        isFloating={isToolbarFloating}
       />
 
-      <EditorContent editor={editor} />
+      <div className="overflow-hidden rounded-b-lg">
+        <EditorContent editor={editor} />
+      </div>
 
       <input
         ref={fileInputRef}
