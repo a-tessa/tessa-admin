@@ -61,3 +61,16 @@ export async function deleteHeroSection(): Promise<void> {
     method: 'DELETE',
   })
 }
+
+export async function deleteHeroSectionSlide(
+  slideIndex: number,
+): Promise<HeroSectionResponse | null> {
+  const response = await authenticatedRequest<HeroSectionResponse | undefined>(
+    `${BASE_PATH}/slides/${String(slideIndex)}`,
+    {
+      method: 'DELETE',
+    },
+  )
+
+  return response ?? null
+}

@@ -22,6 +22,7 @@ import { useHeroSection } from '../hooks/use-hero-section'
 import { useCreateHeroSection } from '../hooks/use-create-hero-section'
 import { useUpdateHeroSection } from '../hooks/use-update-hero-section'
 import { useDeleteHeroSection } from '../hooks/use-delete-hero-section'
+import { useDeleteHeroSectionSlide } from '../hooks/use-delete-hero-section-slide'
 import {
   HeroTopicEditDialog,
   type HeroTopicEditResult,
@@ -163,6 +164,7 @@ export function HeroSectionPage() {
   const createMutation = useCreateHeroSection()
   const updateMutation = useUpdateHeroSection()
   const deleteMutation = useDeleteHeroSection()
+  const deleteSlideMutation = useDeleteHeroSectionSlide()
 
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
@@ -173,7 +175,8 @@ export function HeroSectionPage() {
   const isMutating =
     createMutation.isPending ||
     updateMutation.isPending ||
-    deleteMutation.isPending
+    deleteMutation.isPending ||
+    deleteSlideMutation.isPending
 
   const editingTopic =
     editingIndex !== null && heroSection
@@ -283,20 +286,10 @@ export function HeroSectionPage() {
   function handleRemoveTopic(index: number) {
     if (!heroSection) return
 
-    if (heroSection.length <= 1) {
-      deleteMutation.mutate(undefined, {
-        onSuccess: () => toast.success('Seção hero removida.'),
-        onError: (error) => toast.error(error.message),
-      })
-      return
-    }
-
-    const updatedTopics: HeroTopicInput[] = heroSection
-      .filter((_, i) => i !== index)
-      .map((t) => ({ ...t }))
-
-    updateMutation.mutate(buildFormData(updatedTopics, new Map()), {
-      onSuccess: () => toast.success('Tópico removido.'),
+    deleteSlideMutation.mutate(index, {
+      onSuccess: (data) => {
+        toast.success(data ? 'Tópico removido.' : 'Seção hero removida.')
+      },
       onError: (error) => toast.error(error.message),
     })
   }
@@ -407,7 +400,7 @@ export function HeroSectionPage() {
                   index={index}
                   onEdit={() => openEdit(index)}
                   onRemove={() => handleRemoveTopic(index)}
-                  canRemove={heroSection.length > 1}
+                  canRemove
                   disabled={isMutating}
                 />
                 )
