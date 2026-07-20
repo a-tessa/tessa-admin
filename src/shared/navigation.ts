@@ -11,6 +11,7 @@ export type NavigationIcon =
   | 'message-square-quote'
   | 'handshake'
   | 'newspaper'
+  | 'file-down'
   | 'inbox'
 
 export interface NavigationChild {
@@ -75,6 +76,11 @@ export const navigationItems = [
         to: '/conteudo/blog',
         label: 'Blog',
         icon: 'newspaper',
+      },
+      {
+        to: '/conteudo/documentos',
+        label: 'Documentos',
+        icon: 'file-down',
       },
     ],
   },

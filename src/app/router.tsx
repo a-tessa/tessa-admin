@@ -12,6 +12,7 @@ import { BlogArticleEditPage } from '@/features/content/blog/pages/BlogArticleEd
 import { BlogArticlesPage } from '@/features/content/blog/pages/BlogArticlesPage'
 import { CategoriesPage } from '@/features/content/categories/pages/CategoriesPage'
 import { ClientsPage } from '@/features/content/clients/pages/ClientsPage'
+import { DocumentsPage } from '@/features/content/documents/pages/DocumentsPage'
 import { HeroSectionPage } from '@/features/content/hero/pages/HeroSectionPage'
 import { ContentPageEditPage } from '@/features/content/pages/ContentPageEditPage'
 import { ContentPagesPage } from '@/features/content/pages/ContentPagesPage'
@@ -102,6 +103,12 @@ const contentBlogRoute = createRoute({
   component: BlogArticlesPage,
 })
 
+const contentDocumentsRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'conteudo/documentos',
+  component: DocumentsPage,
+})
+
 const contentBlogCreateRoute = createRoute({
   getParentRoute: () => appRoute,
   path: 'conteudo/blog/novo',
@@ -157,6 +164,7 @@ const routeTree = rootRoute.addChildren([
     contentClientsRoute,
     contentRepresentantsRoute,
     contentBlogRoute,
+    contentDocumentsRoute,
     contentBlogCreateRoute,
     contentBlogEditRoute,
     contentEditRoute,

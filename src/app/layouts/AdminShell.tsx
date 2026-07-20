@@ -3,6 +3,7 @@ import {
   Briefcase,
   Building2,
   ChevronDown,
+  FileDown,
   FileText,
   Handshake,
   Image,
@@ -49,6 +50,7 @@ const iconMap: Record<NavigationIcon, typeof LayoutDashboard> = {
   'message-square-quote': MessageSquareQuote,
   'handshake': Handshake,
   'newspaper': Newspaper,
+  'file-down': FileDown,
   'inbox': Inbox,
   users: Users,
 }
@@ -213,6 +215,7 @@ function PageTitle() {
   if (path === '/conteudo/blog/novo') return 'Novo artigo de blog'
   if (path.startsWith('/conteudo/blog/')) return 'Editar artigo de blog'
   if (path === '/conteudo/blog') return 'Blog'
+  if (path === '/conteudo/documentos') return 'Documentos'
   if (path.startsWith('/conteudo')) return 'Conteúdo'
   if (path.startsWith('/moderacao/depoimentos')) return 'Depoimentos'
   if (path.startsWith('/moderacao')) return 'Moderação'
