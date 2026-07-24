@@ -2,6 +2,7 @@ import { Link, Outlet, useMatches } from '@tanstack/react-router'
 import {
   Briefcase,
   Building2,
+  Camera,
   ChevronDown,
   FileDown,
   FileText,
@@ -52,6 +53,7 @@ const iconMap: Record<NavigationIcon, typeof LayoutDashboard> = {
   'newspaper': Newspaper,
   'file-down': FileDown,
   'inbox': Inbox,
+  'instagram': Camera,
   users: Users,
 }
 

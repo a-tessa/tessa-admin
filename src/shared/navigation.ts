@@ -13,6 +13,7 @@ export type NavigationIcon =
   | 'newspaper'
   | 'file-down'
   | 'inbox'
+  | 'instagram'
 
 export interface NavigationChild {
   readonly to: string
@@ -76,6 +77,11 @@ export const navigationItems = [
         to: '/conteudo/blog',
         label: 'Blog',
         icon: 'newspaper',
+      },
+      {
+        to: '/conteudo/instagram',
+        label: 'Instagram',
+        icon: 'instagram',
       },
       {
         to: '/conteudo/documentos',
