@@ -3,7 +3,7 @@ import type { IndustryLocale, IndustrySection, IndustryVideo } from './types'
 
 export const MAX_INDUSTRY_TITLE_PREFIX_LENGTH = 60
 export const MAX_INDUSTRY_TITLE_LENGTH = 100
-export const MAX_INDUSTRY_SUBTITLE_LENGTH = 300
+export const MAX_INDUSTRY_SUBTITLE_LENGTH = 700
 
 const YOUTUBE_ID_REGEX = /^[a-zA-Z0-9_-]{11}$/
 const NON_NEGATIVE_INTEGER_REGEX = /^\d+$/
