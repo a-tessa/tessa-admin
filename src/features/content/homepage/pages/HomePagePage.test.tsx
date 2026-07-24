@@ -15,6 +15,13 @@ vi.mock('@/features/content/hero/pages/HeroSectionPage', () => ({
   HeroSectionPage: () => <div>Editor existente da Seção Principal</div>,
 }))
 
+vi.mock(
+  '@/features/content/industry/components/IndustrySectionEditor',
+  () => ({
+    IndustrySectionEditor: () => <div>Editor da seção Indústria</div>,
+  }),
+)
+
 function renderPage(initialEntry: string) {
   const rootRoute = createRootRoute()
   const homepageRoute = createRoute({
@@ -89,7 +96,7 @@ describe('editor da Página inicial', () => {
       expect(router.state.location.searchStr).toBe('?aba=industria')
     })
     expect(
-      screen.getByText('O editor de Indústria será disponibilizado em breve.'),
+      screen.getByText('Editor da seção Indústria'),
     ).toBeInTheDocument()
   })
 })

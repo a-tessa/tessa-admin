@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from '@tanstack/react-router'
 import { Clock3 } from 'lucide-react'
 import { useEffect } from 'react'
 import { HeroSectionPage } from '@/features/content/hero/pages/HeroSectionPage'
+import { IndustrySectionEditor } from '@/features/content/industry/components/IndustrySectionEditor'
 import {
   homePageRoutePath,
   isHomePageSection,
@@ -120,7 +121,7 @@ export function HomePagePage() {
           <HeroSectionPage />
         </TabsContent>
         <TabsContent value="industria" className="mt-4 text-sm">
-          <PendingSection name="Indústria" />
+          <IndustrySectionEditor />
         </TabsContent>
         <TabsContent value="operacoes" className="mt-4 text-sm">
           <PendingSection name="Operações" />

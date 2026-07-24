@@ -6,6 +6,8 @@
    `body { font-synthesis: none }`, o itálico praticamente some no navegador. */
 @import "@fontsource-variable/figtree/wght-italic.css";
 @import "@fontsource-variable/outfit";
+@import "@fontsource/barlow/600.css";
+@import "@fontsource/barlow/700.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -49,6 +51,7 @@
 
   --font-sans: 'Figtree Variable', sans-serif;
   --font-display: "Aptos Display", "Aptos", "Avenir Next", "Segoe UI", sans-serif;
+  --font-industry: "Barlow", sans-serif;
 
   --color-brand-50: oklch(0.97 0.02 163);
   --color-brand-100: oklch(0.93 0.04 163);
