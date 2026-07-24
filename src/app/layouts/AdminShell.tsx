@@ -218,7 +218,7 @@ function PageTitle() {
   if (path.startsWith('/conteudo/blog/')) return 'Editar artigo de blog'
   if (path === '/conteudo/blog') return 'Blog'
   if (path === '/conteudo/documentos') return 'Documentos'
-  if (path.startsWith('/conteudo')) return 'Conteúdo'
+  if (path.startsWith('/conteudo')) return 'Conteúdos'
   if (path.startsWith('/moderacao/depoimentos')) return 'Depoimentos'
   if (path.startsWith('/moderacao')) return 'Moderação'
   if (path.startsWith('/usuarios')) return 'Usuários'

@@ -44,7 +44,7 @@ export const navigationItems = [
   },
   {
     to: '/conteudo',
-    label: 'Conteúdo',
+    label: 'Conteúdos',
     summary: 'Listar, editar e publicar páginas.',
     icon: 'file-text',
     children: [

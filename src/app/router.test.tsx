@@ -18,9 +18,9 @@ vi.mock('@/features/content/hero/pages/HeroSectionPage', () => ({
 }))
 
 describe('navegação da Página inicial', () => {
-  it('oferece Página inicial dentro de Conteúdo sem um item Hero separado', () => {
+  it('oferece Página inicial dentro de Conteúdos sem um item Hero separado', () => {
     const contentItem = navigationItems.find(
-      (item) => item.label === 'Conteúdo',
+      (item) => item.label === 'Conteúdos',
     )
 
     expect(contentItem?.children?.[0]).toMatchObject({
