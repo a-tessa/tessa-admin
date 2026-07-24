@@ -49,8 +49,8 @@ export const navigationItems = [
     icon: 'file-text',
     children: [
       {
-        to: '/conteudo/hero',
-        label: 'Seção Principal',
+        to: '/conteudo/pagina-inicial',
+        label: 'Página inicial',
         icon: 'image',
       },
       {

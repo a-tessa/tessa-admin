@@ -13,7 +13,8 @@ import { BlogArticlesPage } from '@/features/content/blog/pages/BlogArticlesPage
 import { CategoriesPage } from '@/features/content/categories/pages/CategoriesPage'
 import { ClientsPage } from '@/features/content/clients/pages/ClientsPage'
 import { DocumentsPage } from '@/features/content/documents/pages/DocumentsPage'
-import { HeroSectionPage } from '@/features/content/hero/pages/HeroSectionPage'
+import { validateHomePageSearch } from '@/features/content/homepage/homepage-search'
+import { HomePagePage } from '@/features/content/homepage/pages/HomePagePage'
 import { InstagramPage } from '@/features/content/instagram/pages/InstagramPage'
 import { ContentPageEditPage } from '@/features/content/pages/ContentPageEditPage'
 import { ContentPagesPage } from '@/features/content/pages/ContentPagesPage'
@@ -62,10 +63,23 @@ const contentRoute = createRoute({
   component: ContentPagesPage,
 })
 
+const contentHomepageRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'conteudo/pagina-inicial',
+  validateSearch: validateHomePageSearch,
+  component: HomePagePage,
+})
+
 const contentHeroRoute = createRoute({
   getParentRoute: () => appRoute,
   path: 'conteudo/hero',
-  component: HeroSectionPage,
+  component: () => (
+    <Navigate
+      to="/conteudo/pagina-inicial"
+      search={{ aba: 'secao-principal' }}
+      replace
+    />
+  ),
 })
 
 const contentCategoriesRoute = createRoute({
@@ -158,12 +172,13 @@ const profileRoute = createRoute({
   component: ProfilePage,
 })
 
-const routeTree = rootRoute.addChildren([
+export const routeTree = rootRoute.addChildren([
   loginRoute,
   appRoute.addChildren([
     indexRoute,
     dashboardRoute,
     contentRoute,
+    contentHomepageRoute,
     contentHeroRoute,
     contentCategoriesRoute,
     contentServicesRoute,

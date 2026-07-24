@@ -208,7 +208,7 @@ function PageTitle() {
   const path = lastMatch?.pathname ?? ''
 
   if (path.startsWith('/dashboard')) return 'Visão geral'
-  if (path === '/conteudo/hero') return 'Seção Principal'
+  if (path === '/conteudo/pagina-inicial') return 'Página inicial'
   if (path === '/conteudo/categorias') return 'Categorias'
   if (path.startsWith('/conteudo/servicos')) return 'Serviços'
   if (path === '/conteudo/cenarios') return 'Cenários'
