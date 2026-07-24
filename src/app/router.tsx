@@ -13,6 +13,10 @@ import { BlogArticlesPage } from '@/features/content/blog/pages/BlogArticlesPage
 import { CategoriesPage } from '@/features/content/categories/pages/CategoriesPage'
 import { ClientsPage } from '@/features/content/clients/pages/ClientsPage'
 import { DocumentsPage } from '@/features/content/documents/pages/DocumentsPage'
+import {
+  GalleryPage,
+  validateGallerySearch,
+} from '@/features/content/gallery'
 import { validateHomePageSearch } from '@/features/content/homepage/homepage-search'
 import { HomePagePage } from '@/features/content/homepage/pages/HomePagePage'
 import { InstagramPage } from '@/features/content/instagram/pages/InstagramPage'
@@ -124,6 +128,13 @@ const contentDocumentsRoute = createRoute({
   component: DocumentsPage,
 })
 
+const contentGalleryRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'conteudo/galeria',
+  validateSearch: validateGallerySearch,
+  component: GalleryPage,
+})
+
 const contentInstagramRoute = createRoute({
   getParentRoute: () => appRoute,
   path: 'conteudo/instagram',
@@ -187,6 +198,7 @@ export const routeTree = rootRoute.addChildren([
     contentRepresentantsRoute,
     contentBlogRoute,
     contentDocumentsRoute,
+    contentGalleryRoute,
     contentInstagramRoute,
     contentBlogCreateRoute,
     contentBlogEditRoute,

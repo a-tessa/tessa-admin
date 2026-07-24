@@ -88,6 +88,11 @@ export const navigationItems = [
         label: 'Documentos',
         icon: 'file-down',
       },
+      {
+        to: '/conteudo/galeria',
+        label: 'Galeria',
+        icon: 'image',
+      },
     ],
   },
   {
