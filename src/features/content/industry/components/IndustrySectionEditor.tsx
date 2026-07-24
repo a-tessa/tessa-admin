@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useBlocker } from '@tanstack/react-router'
 import {
   AlertCircle,
+  ArrowDown,
   Info,
   Loader2,
   RotateCcw,
@@ -193,7 +194,7 @@ function IndustryPreview({
     : null
 
   return (
-    <Card className="overflow-hidden">
+    <Card id="industry-preview" className="scroll-mt-20 overflow-hidden">
       <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <CardTitle>Prévia responsiva</CardTitle>
@@ -431,6 +432,33 @@ export function IndustrySectionEditor() {
 
   return (
     <div className="flex flex-col gap-6">
+      <Alert className="border-amber-300 bg-amber-50 text-amber-950 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-50 [&>svg]:text-amber-600 dark:[&>svg]:text-amber-300">
+        <Info aria-hidden="true" />
+        <AlertTitle className="text-amber-950 dark:text-amber-50">
+          Prévia disponível mais abaixo
+        </AlertTitle>
+        <AlertDescription className="gap-3 text-amber-900/90 dark:text-amber-100/90">
+          <p>
+            A prévia responsiva fica no final desta página e atualiza conforme
+            você edita os campos.
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="border-amber-400 bg-white text-amber-950 hover:bg-amber-100 hover:text-amber-950 dark:border-amber-500/50 dark:bg-amber-950/50 dark:text-amber-50 dark:hover:bg-amber-950/80 dark:hover:text-amber-50"
+            onClick={(): void => {
+              document
+                .getElementById('industry-preview')
+                ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }}
+          >
+            <ArrowDown aria-hidden="true" className="size-4" />
+            Ir para a prévia
+          </Button>
+        </AlertDescription>
+      </Alert>
+
       <Card>
         <CardHeader>
           <CardTitle>Conteúdo em português</CardTitle>

@@ -49,8 +49,6 @@ import {
 } from '@/shared/components/ui/card'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 
-const MAX_TOPICS = 3
-
 function SortableHeroTopicCard({
   id,
   topic,
@@ -307,7 +305,7 @@ export function HeroSectionPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          {hasHero && heroSection.length < MAX_TOPICS ? (
+          {hasHero ? (
             <Button
               size="sm"
               className="gap-2"
