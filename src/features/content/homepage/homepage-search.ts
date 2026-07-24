@@ -1,3 +1,5 @@
+export const homePageRoutePath = '/conteudo/pagina-inicial'
+
 const homepageSections = [
   'secao-principal',
   'industria',

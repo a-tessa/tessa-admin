@@ -17,6 +17,10 @@ vi.mock('@/features/content/hero/pages/HeroSectionPage', () => ({
   HeroSectionPage: () => <div>Editor existente da Seção Principal</div>,
 }))
 
+vi.mock('@/features/dashboard/pages/DashboardPage', () => ({
+  DashboardPage: () => <div>Painel de visão geral</div>,
+}))
+
 describe('navegação da Página inicial', () => {
   it('oferece Página inicial dentro de Conteúdos sem um item Hero separado', () => {
     const contentItem = navigationItems.find(
@@ -55,5 +59,29 @@ describe('navegação da Página inicial', () => {
         aba: 'secao-principal',
       })
     })
+  })
+
+  it('permite sair da Página inicial para outra rota', async () => {
+    const router = createRouter({
+      routeTree,
+      history: createMemoryHistory({
+        initialEntries: ['/conteudo/pagina-inicial'],
+      }),
+    })
+
+    render(<RouterProvider router={router} />)
+
+    await screen.findByText('Editor existente da Seção Principal')
+    await waitFor(() => {
+      expect(router.state.location.searchStr).toBe('?aba=secao-principal')
+    })
+
+    await router.navigate({ to: '/dashboard' })
+
+    expect(await screen.findByText('Painel de visão geral')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/dashboard')
+    })
+    expect(router.state.location.pathname).toBe('/dashboard')
   })
 })

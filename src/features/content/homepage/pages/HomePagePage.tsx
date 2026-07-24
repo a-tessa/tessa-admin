@@ -3,6 +3,7 @@ import { Clock3 } from 'lucide-react'
 import { useEffect } from 'react'
 import { HeroSectionPage } from '@/features/content/hero/pages/HeroSectionPage'
 import {
+  homePageRoutePath,
   isHomePageSection,
   validateHomePageSearch,
 } from '@/features/content/homepage/homepage-search'
@@ -50,7 +51,13 @@ export function HomePagePage() {
   const searchString: string = location.searchStr
   const navigate = useNavigate({ from: '/conteudo/pagina-inicial' })
 
+  const pathname: string = location.pathname
+
   useEffect(() => {
+    if (pathname !== homePageRoutePath) {
+      return
+    }
+
     const urlSearch: URLSearchParams = new URLSearchParams(searchString)
 
     if (urlSearch.get('aba') === activeSection) {
@@ -61,7 +68,7 @@ export function HomePagePage() {
       search: { aba: activeSection },
       replace: true,
     })
-  }, [activeSection, navigate, searchString])
+  }, [activeSection, navigate, pathname, searchString])
 
   function handleSectionChange(value: string): void {
     if (!isHomePageSection(value)) {
