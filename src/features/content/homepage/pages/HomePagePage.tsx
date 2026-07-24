@@ -1,8 +1,8 @@
 import { useLocation, useNavigate } from '@tanstack/react-router'
-import { Clock3 } from 'lucide-react'
 import { useEffect } from 'react'
 import { HeroSectionPage } from '@/features/content/hero/pages/HeroSectionPage'
 import { IndustrySectionEditor } from '@/features/content/industry/components/IndustrySectionEditor'
+import { OperationSectionEditor } from '@/features/content/operations/components/OperationSectionEditor'
 import {
   homePageRoutePath,
   isHomePageSection,
@@ -10,39 +10,11 @@ import {
 } from '@/features/content/homepage/homepage-search'
 import type { HomePageSection } from '@/features/content/homepage/homepage-search'
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardTitle,
-} from '@/shared/components/ui/card'
-import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from '@/shared/components/ui/tabs'
-
-interface PendingSectionProps {
-  readonly name: 'Indústria' | 'Operações'
-}
-
-function PendingSection({ name }: PendingSectionProps) {
-  return (
-    <Card className="border-dashed">
-      <CardContent className="flex min-h-52 flex-col items-center justify-center gap-4 px-6 py-10 text-center">
-        <div className="flex size-11 items-center justify-center rounded-full bg-muted text-muted-foreground">
-          <Clock3 aria-hidden="true" className="size-5" />
-        </div>
-        <div className="space-y-1.5">
-          <CardTitle className="text-base">Editor em preparação</CardTitle>
-          <CardDescription className="text-pretty">
-            O editor de {name} será disponibilizado em breve.
-          </CardDescription>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
 
 export function HomePagePage() {
   const location = useLocation()
@@ -124,7 +96,7 @@ export function HomePagePage() {
           <IndustrySectionEditor />
         </TabsContent>
         <TabsContent value="operacoes" className="mt-4 text-sm">
-          <PendingSection name="Operações" />
+          <OperationSectionEditor />
         </TabsContent>
       </Tabs>
     </div>

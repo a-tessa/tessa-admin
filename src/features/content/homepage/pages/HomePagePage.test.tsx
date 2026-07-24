@@ -22,6 +22,13 @@ vi.mock(
   }),
 )
 
+vi.mock(
+  '@/features/content/operations/components/OperationSectionEditor',
+  () => ({
+    OperationSectionEditor: () => <div>Editor da seção Operações</div>,
+  }),
+)
+
 function renderPage(initialEntry: string) {
   const rootRoute = createRootRoute()
   const homepageRoute = createRoute({
@@ -76,7 +83,7 @@ describe('editor da Página inicial', () => {
       await screen.findByRole('tab', { name: 'Operações' }),
     ).toHaveAttribute('aria-selected', 'true')
     expect(
-      screen.getByText('O editor de Operações será disponibilizado em breve.'),
+      screen.getByText('Editor da seção Operações'),
     ).toBeInTheDocument()
     expect(
       screen.queryByText('Editor existente da Seção Principal'),
