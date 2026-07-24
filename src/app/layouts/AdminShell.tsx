@@ -66,7 +66,7 @@ function getInitials(name: string): string {
     .toUpperCase()
 }
 
-function NavLink({
+export function NavLink({
   to,
   icon,
   label,
@@ -84,7 +84,7 @@ function NavLink({
     <Link
       to={to}
       onClick={onNavigate}
-      activeOptions={{ exact: true }}
+      activeOptions={{ exact: true, includeSearch: false }}
       activeProps={{ className: 'bg-primary/10 text-primary font-semibold' }}
       inactiveProps={{ className: 'text-muted-foreground hover:bg-accent hover:text-accent-foreground' }}
       className={cn(
