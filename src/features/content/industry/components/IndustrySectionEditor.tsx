@@ -2,14 +2,16 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useBlocker } from '@tanstack/react-router'
 import {
   AlertCircle,
+  Info,
   Loader2,
   RotateCcw,
   Save,
   Trash2,
   Video,
 } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
+import type { Control } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   defaultIndustrySectionFormValues,
@@ -18,10 +20,16 @@ import {
   MAX_INDUSTRY_SUBTITLE_LENGTH,
   MAX_INDUSTRY_TITLE_LENGTH,
   MAX_INDUSTRY_TITLE_PREFIX_LENGTH,
+  resolvePreviewVideo,
   toIndustrySectionFormValues,
   toIndustrySectionInput,
 } from '../industry.schema'
-import type { IndustrySectionFormValues } from '../industry.schema'
+import type {
+  IndustrySectionFormValues,
+  PreviewVideo,
+  VideoFormFields,
+} from '../industry.schema'
+import type { IndustryLocale } from '../types'
 import {
   useDeleteIndustrySection,
   useIndustrySection,
@@ -62,7 +70,82 @@ import {
 } from '@/shared/components/ui/form'
 import { Input } from '@/shared/components/ui/input'
 import { Skeleton } from '@/shared/components/ui/skeleton'
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from '@/shared/components/ui/tabs'
 import { Textarea } from '@/shared/components/ui/textarea'
+
+const PREVIEW_LOCALE_LABELS: Record<IndustryLocale, string> = {
+  'pt-BR': 'Português',
+  en: 'Inglês',
+  es: 'Espanhol',
+}
+
+interface VideoUrlFieldsProps {
+  readonly control: Control<IndustrySectionFormValues>
+  readonly urlName: 'videoUrl' | 'videoUrlEn' | 'videoUrlEs'
+  readonly startSecondsName: 'startSeconds' | 'startSecondsEn' | 'startSecondsEs'
+  readonly urlLabel: string
+  readonly startSecondsLabel: string
+  readonly urlDescription: string
+}
+
+function VideoUrlFields({
+  control,
+  urlName,
+  startSecondsName,
+  urlLabel,
+  startSecondsLabel,
+  urlDescription,
+}: VideoUrlFieldsProps) {
+  return (
+    <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_9rem]">
+      <FormField
+        control={control}
+        name={urlName}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{urlLabel}</FormLabel>
+            <FormControl>
+              <Input
+                type="url"
+                inputMode="url"
+                placeholder="https://www.youtube.com/watch?v=..."
+                {...field}
+              />
+            </FormControl>
+            <FormDescription>{urlDescription}</FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name={startSecondsName}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{startSecondsLabel}</FormLabel>
+            <FormControl>
+              <Input
+                type="number"
+                inputMode="numeric"
+                min={0}
+                step={1}
+                placeholder="0"
+                {...field}
+              />
+            </FormControl>
+            <FormDescription>Opcional.</FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </div>
+  )
+}
 
 interface CharacterCounterProps {
   readonly current: number
@@ -84,20 +167,22 @@ interface IndustryPreviewProps {
   readonly titlePrefix: string
   readonly title: string
   readonly subtitle: string
-  readonly videoUrl: string
-  readonly startSeconds: string
+  readonly locale: IndustryLocale
+  readonly onLocaleChange: (locale: IndustryLocale) => void
+  readonly video: PreviewVideo
 }
 
 function IndustryPreview({
   titlePrefix,
   title,
   subtitle,
-  videoUrl,
-  startSeconds,
+  locale,
+  onLocaleChange,
+  video,
 }: IndustryPreviewProps) {
-  const videoId: string | null = getYouTubeVideoId(videoUrl)
-  const parsedStartSeconds: number | null = /^\d+$/.test(startSeconds)
-    ? Number.parseInt(startSeconds, 10)
+  const videoId: string | null = getYouTubeVideoId(video.videoUrl)
+  const parsedStartSeconds: number | null = /^\d+$/.test(video.startSeconds)
+    ? Number.parseInt(video.startSeconds, 10)
     : null
   const embedUrl: string | null = videoId
     ? `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1${
@@ -109,13 +194,36 @@ function IndustryPreview({
 
   return (
     <Card className="overflow-hidden">
-      <CardHeader>
-        <CardTitle>Prévia responsiva</CardTitle>
-        <CardDescription>
-          Representação da seção publicada em português.
-        </CardDescription>
+      <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <CardTitle>Prévia responsiva</CardTitle>
+          <CardDescription>
+            O texto sempre reflete o conteúdo em português. Alterne o idioma
+            para conferir qual vídeo será exibido em cada locale.
+          </CardDescription>
+        </div>
+        <Tabs
+          value={locale}
+          onValueChange={(value): void => onLocaleChange(value as IndustryLocale)}
+        >
+          <TabsList>
+            <TabsTrigger value="pt-BR">Português</TabsTrigger>
+            <TabsTrigger value="en">Inglês</TabsTrigger>
+            <TabsTrigger value="es">Espanhol</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        {video.isFallback ? (
+          <Alert>
+            <Info aria-hidden="true" />
+            <AlertDescription>
+              Vídeo em {PREVIEW_LOCALE_LABELS[locale]} não configurado.
+              Exibindo o vídeo em português como substituto.
+            </AlertDescription>
+          </Alert>
+        ) : null}
+
         <section
           aria-labelledby="industry-preview-title"
           className="grid gap-8 rounded-xl bg-background p-5 shadow-sm ring-1 ring-foreground/5 md:p-8 xl:grid-cols-[minmax(0,1fr)_minmax(280px,550px)] xl:items-center"
@@ -198,6 +306,7 @@ export function IndustrySectionEditor() {
     mode: 'onBlur',
   })
   const isDirty: boolean = form.formState.isDirty
+  const [previewLocale, setPreviewLocale] = useState<IndustryLocale>('pt-BR')
 
   useBlocker({
     shouldBlockFn: (): boolean =>
@@ -235,6 +344,31 @@ export function IndustrySectionEditor() {
     control: form.control,
     name: 'startSeconds',
   })
+  const videoUrlEn: string = useWatch({
+    control: form.control,
+    name: 'videoUrlEn',
+  })
+  const startSecondsEn: string = useWatch({
+    control: form.control,
+    name: 'startSecondsEn',
+  })
+  const videoUrlEs: string = useWatch({
+    control: form.control,
+    name: 'videoUrlEs',
+  })
+  const startSecondsEs: string = useWatch({
+    control: form.control,
+    name: 'startSecondsEs',
+  })
+  const localizedVideoByLocale: Record<Exclude<IndustryLocale, 'pt-BR'>, VideoFormFields> = {
+    en: { url: videoUrlEn, startSeconds: startSecondsEn },
+    es: { url: videoUrlEs, startSeconds: startSecondsEs },
+  }
+  const previewVideo = resolvePreviewVideo(
+    previewLocale,
+    { url: videoUrl, startSeconds },
+    previewLocale === 'pt-BR' ? undefined : localizedVideoByLocale[previewLocale],
+  )
   const hasValidationErrors: boolean =
     form.formState.submitCount > 0 &&
     Object.keys(form.formState.errors).length > 0
@@ -404,49 +538,42 @@ export function IndustrySectionEditor() {
                 )}
               />
 
-              <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_9rem]">
-                <FormField
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-sm font-medium text-foreground">
+                    Vídeos por idioma
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Inglês e espanhol são opcionais. Quando vazios, a landing
+                    usa o vídeo em português nesses idiomas.
+                  </p>
+                </div>
+
+                <VideoUrlFields
                   control={form.control}
-                  name="videoUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>URL do YouTube — Português</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="url"
-                          inputMode="url"
-                          placeholder="https://www.youtube.com/watch?v=..."
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Aceita links youtube.com e youtu.be.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  urlName="videoUrl"
+                  startSecondsName="startSeconds"
+                  urlLabel="URL do YouTube — Português"
+                  startSecondsLabel="Segundo inicial — Português"
+                  urlDescription="Aceita links youtube.com e youtu.be."
                 />
 
-                <FormField
+                <VideoUrlFields
                   control={form.control}
-                  name="startSeconds"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Segundo inicial</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          inputMode="numeric"
-                          min={0}
-                          step={1}
-                          placeholder="0"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>Opcional.</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  urlName="videoUrlEn"
+                  startSecondsName="startSecondsEn"
+                  urlLabel="URL do YouTube — Inglês (opcional)"
+                  startSecondsLabel="Segundo inicial — Inglês"
+                  urlDescription="Deixe em branco para usar o vídeo em português."
+                />
+
+                <VideoUrlFields
+                  control={form.control}
+                  urlName="videoUrlEs"
+                  startSecondsName="startSecondsEs"
+                  urlLabel="URL do YouTube — Espanhol (opcional)"
+                  startSecondsLabel="Segundo inicial — Espanhol"
+                  urlDescription="Deixe em branco para usar o vídeo em português."
                 />
               </div>
 
@@ -521,8 +648,9 @@ export function IndustrySectionEditor() {
         titlePrefix={titlePrefix}
         title={title}
         subtitle={subtitle}
-        videoUrl={videoUrl}
-        startSeconds={startSeconds}
+        locale={previewLocale}
+        onLocaleChange={setPreviewLocale}
+        video={previewVideo}
       />
     </div>
   )

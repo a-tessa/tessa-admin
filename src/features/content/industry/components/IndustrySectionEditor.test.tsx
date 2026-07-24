@@ -53,6 +53,16 @@ const section: IndustrySection = {
     },
   },
 }
+const sectionWithSpanishVideo: IndustrySection = {
+  ...section,
+  videos: {
+    ...section.videos,
+    es: {
+      url: 'https://www.youtube.com/watch?v=eGdFPCZYNYQ',
+      startSeconds: 6,
+    },
+  },
+}
 
 function renderEditor() {
   const rootRoute = createRootRoute()
@@ -115,6 +125,92 @@ describe('editor da seção Indústria', () => {
     await user.type(titleInput, 'indústria sob medida')
 
     expect(screen.getByText('indústria sob medida')).toBeInTheDocument()
+  })
+
+  it('evidencia o vídeo em português como substituto ao alternar para um idioma sem vídeo próprio', async () => {
+    const user = userEvent.setup()
+    renderEditor()
+
+    await screen.findByLabelText('Título principal')
+    expect(
+      screen.queryByText(/não configurado\. Exibindo o vídeo em português/),
+    ).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('tab', { name: 'Inglês' }))
+
+    expect(
+      await screen.findByText(
+        'Vídeo em Inglês não configurado. Exibindo o vídeo em português como substituto.',
+      ),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByTitle('Prévia do vídeo da seção Indústria'),
+    ).toHaveAttribute('src', expect.stringContaining('EeLYcZsdYrw'))
+  })
+
+  it('usa o vídeo do idioma quando configurado, sem exibir o aviso de substituto', async () => {
+    const user = userEvent.setup()
+    mockedFetch.mockReset()
+    mockedFetch.mockResolvedValue(sectionWithSpanishVideo)
+    renderEditor()
+
+    await screen.findByLabelText('Título principal')
+    await user.click(screen.getByRole('tab', { name: 'Espanhol' }))
+
+    expect(
+      screen.queryByText(/não configurado\. Exibindo o vídeo em português/),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.getByTitle('Prévia do vídeo da seção Indústria'),
+    ).toHaveAttribute('src', expect.stringContaining('eGdFPCZYNYQ'))
+  })
+
+  it('permite salvar sem preencher os vídeos opcionais de inglês e espanhol', async () => {
+    const user = userEvent.setup()
+    renderEditor()
+
+    const titleInput = await screen.findByLabelText('Título principal')
+    await user.clear(titleInput)
+    await user.type(titleInput, 'indústria brasileira renovada')
+    await user.click(screen.getByRole('button', { name: 'Salvar rascunho' }))
+
+    await waitFor(() => {
+      expect(mockedUpdate).toHaveBeenCalledWith({
+        ...section,
+        title: 'indústria brasileira renovada',
+      })
+    })
+  })
+
+  it('valida e envia os vídeos opcionais de inglês e espanhol quando preenchidos', async () => {
+    const user = userEvent.setup()
+    renderEditor()
+
+    await screen.findByLabelText('Título principal')
+    await user.type(
+      screen.getByLabelText('URL do YouTube — Inglês (opcional)'),
+      'https://youtu.be/EeLYcZsdYrw',
+    )
+    await user.type(
+      screen.getByLabelText('URL do YouTube — Espanhol (opcional)'),
+      'https://www.youtube.com/watch?v=eGdFPCZYNYQ',
+    )
+    await user.type(screen.getByLabelText('Segundo inicial — Espanhol'), '6')
+    await user.click(screen.getByRole('button', { name: 'Salvar rascunho' }))
+
+    await waitFor(() => {
+      expect(mockedUpdate).toHaveBeenCalledWith({
+        ...section,
+        videos: {
+          ...section.videos,
+          en: { url: 'https://youtu.be/EeLYcZsdYrw' },
+          es: {
+            url: 'https://www.youtube.com/watch?v=eGdFPCZYNYQ',
+            startSeconds: 6,
+          },
+        },
+      })
+    })
   })
 
   it('valida junto ao campo e salva somente o rascunho', async () => {
@@ -183,7 +279,7 @@ describe('editor da seção Indústria', () => {
       screen.getByLabelText('URL do YouTube — Português'),
       section.videos['pt-BR'].url,
     )
-    await user.type(screen.getByLabelText('Segundo inicial'), '8')
+    await user.type(screen.getByLabelText('Segundo inicial — Português'), '8')
     await user.click(screen.getByRole('button', { name: 'Salvar rascunho' }))
 
     await waitFor(() => {
