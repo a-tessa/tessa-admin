@@ -140,7 +140,7 @@ function IndustryPreview({
             />
           </div>
 
-          <div className="relative mx-auto aspect-video w-full max-w-[550px] overflow-hidden rounded-3xl bg-muted shadow-lg ring-1 ring-foreground/10 xl:max-w-none">
+          <div className="relative mx-auto aspect-video w-full max-w-137.5 overflow-hidden rounded-3xl bg-muted shadow-lg ring-1 ring-foreground/10 xl:max-w-none">
             {embedUrl ? (
               <iframe
                 src={embedUrl}
@@ -296,7 +296,7 @@ export function IndustrySectionEditor() {
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(420px,1.1fr)] xl:items-start">
+    <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
           <CardTitle>Conteúdo em português</CardTitle>
