@@ -22,6 +22,7 @@ import {
 import { useState } from 'react'
 import { useAuth } from '@/features/auth/use-auth'
 import { PublishFloatingBar } from '@/features/content/publish'
+import { PublicationReadinessProvider } from '@/features/content/publish/publication-readiness'
 import { TessaLogo } from '@/shared/components/tessa-logo'
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar'
 import { Badge } from '@/shared/components/ui/badge'
@@ -230,7 +231,8 @@ export function AdminShell() {
   const [sheetOpen, setSheetOpen] = useState(false)
 
   return (
-    <div className="flex min-h-dvh">
+    <PublicationReadinessProvider>
+      <div className="flex min-h-dvh">
       <aside className="hidden w-64 shrink-0 border-r bg-card lg:block">
         <div className="sticky top-0 h-dvh overflow-y-auto">
           <SidebarContent />
@@ -263,6 +265,7 @@ export function AdminShell() {
 
         <PublishFloatingBar />
       </div>
-    </div>
+      </div>
+    </PublicationReadinessProvider>
   )
 }

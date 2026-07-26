@@ -1,4 +1,8 @@
-import { ApiError, authenticatedRequest } from '@/shared/lib/api'
+import {
+  ApiError,
+  authenticatedRequest,
+  authenticatedUploadRequest,
+} from '@/shared/lib/api'
 import type {
   OperationAssetUploadResponse,
   OperationSection,
@@ -49,6 +53,7 @@ export async function deleteOperationSection(): Promise<void> {
 export async function uploadOperationAsset(
   file: File,
   index?: number,
+  onProgress?: (percentage: number) => void,
 ): Promise<OperationAssetUploadResponse> {
   const formData = new FormData()
   formData.append('file', file)
@@ -56,8 +61,9 @@ export async function uploadOperationAsset(
     formData.append('index', String(index))
   }
 
-  return authenticatedRequest<OperationAssetUploadResponse>(ASSETS_PATH, {
-    method: 'POST',
-    body: formData,
-  })
+  return authenticatedUploadRequest<OperationAssetUploadResponse>(
+    ASSETS_PATH,
+    formData,
+    onProgress,
+  )
 }

@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { ApiError, authenticatedRequest } from '@/shared/lib/api'
+import {
+  ApiError,
+  authenticatedRequest,
+  authenticatedUploadRequest,
+} from '@/shared/lib/api'
 import {
   createOperationSection,
   deleteOperationSection,
@@ -19,9 +23,11 @@ vi.mock('@/shared/lib/api', () => ({
     }
   },
   authenticatedRequest: vi.fn(),
+  authenticatedUploadRequest: vi.fn(),
 }))
 
 const mockedRequest = vi.mocked(authenticatedRequest)
+const mockedUploadRequest = vi.mocked(authenticatedUploadRequest)
 const section: OperationSection = {
   images: [
     {
@@ -35,6 +41,7 @@ const section: OperationSection = {
 describe('serviço da seção Operações', () => {
   beforeEach(() => {
     mockedRequest.mockReset()
+    mockedUploadRequest.mockReset()
   })
 
   it('representa uma seção ainda não criada como nula', async () => {
@@ -90,7 +97,7 @@ describe('serviço da seção Operações', () => {
     const file = new File([new Uint8Array([1, 2, 3])], 'foto.jpg', {
       type: 'image/jpeg',
     })
-    mockedRequest.mockResolvedValueOnce({
+    mockedUploadRequest.mockResolvedValueOnce({
       url: 'https://cdn.example.com/foto.webp',
       pathname: 'landing-page/home/operation-section/image-2/foto.webp',
       mimeType: 'image/webp',
@@ -99,17 +106,17 @@ describe('serviço da seção Operações', () => {
       index: 2,
     })
 
-    await uploadOperationAsset(file, 2)
+    const handleProgress = vi.fn()
+    await uploadOperationAsset(file, 2, handleProgress)
 
-    expect(mockedRequest).toHaveBeenCalledTimes(1)
-    const call = mockedRequest.mock.calls[0]
+    expect(mockedUploadRequest).toHaveBeenCalledTimes(1)
+    const call = mockedUploadRequest.mock.calls[0]
     expect(call).toBeDefined()
-    const [path, init] = call ?? []
+    const [path, formData, onProgress] = call ?? []
     expect(path).toBe('/api/content/admin/operation-section/assets')
-    expect(init?.method).toBe('POST')
-    expect(init?.body).toBeInstanceOf(FormData)
-    const formData = init?.body as FormData
+    expect(formData).toBeInstanceOf(FormData)
     expect(formData.get('file')).toBe(file)
     expect(formData.get('index')).toBe('2')
+    expect(onProgress).toBe(handleProgress)
   })
 })

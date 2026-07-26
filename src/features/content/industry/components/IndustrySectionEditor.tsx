@@ -36,6 +36,7 @@ import {
   useIndustrySection,
   useSaveIndustrySection,
 } from '../hooks/use-industry-section'
+import { useRegisterPublicationEditorState } from '@/features/content/publish/publication-readiness'
 import {
   Alert,
   AlertDescription,
@@ -375,6 +376,15 @@ export function IndustrySectionEditor() {
     Object.keys(form.formState.errors).length > 0
   const isSaving: boolean = saveMutation.isPending
   const isDeleting: boolean = deleteMutation.isPending
+
+  useRegisterPublicationEditorState({
+    id: 'homepage-industry',
+    label: 'Indústria',
+    tab: 'industria',
+    isDirty,
+    isInvalid: hasValidationErrors,
+    isUploading: false,
+  })
 
   function handleSubmit(values: IndustrySectionFormValues): void {
     const input = toIndustrySectionInput(values)

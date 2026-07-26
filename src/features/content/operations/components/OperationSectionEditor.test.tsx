@@ -7,6 +7,7 @@ import {
 } from '@tanstack/react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {
+  act,
   cleanup,
   fireEvent,
   render,
@@ -240,7 +241,11 @@ describe('OperationSectionEditor', () => {
 
     await user.upload(fileInput, [fileA, fileB])
 
-    expect(await screen.findAllByText('Enviando…')).toHaveLength(2)
+    expect(await screen.findAllByText('Enviando 0%')).toHaveLength(2)
+    act(() => {
+      mockedUpload.mock.calls[0]?.[2]?.(42)
+    })
+    expect(await screen.findByText('Enviando 42%')).toBeInTheDocument()
 
     rejectFirst?.(new Error('Falha temporária'))
     resolveSecond?.({
@@ -299,5 +304,81 @@ describe('OperationSectionEditor', () => {
         'Nenhuma imagem no rascunho. Adicione arquivos para começar.',
       ),
     ).toBeInTheDocument()
+  })
+
+  it('impede novas seleções ao atingir o limite de 40 imagens', async () => {
+    const { toast } = await import('sonner')
+    mockedFetch.mockResolvedValue({
+      images: Array.from({ length: 40 }, (_, index) => ({
+        url: `https://cdn.example.com/operations/${String(index)}.webp`,
+        alt: `Alt ${String(index)}`,
+      })),
+    })
+
+    renderEditor()
+    expect(await screen.findByText('40 / 40 imagens')).toBeInTheDocument()
+
+    const fileInput = document.querySelector('input[type="file"][multiple]')
+    if (!(fileInput instanceof HTMLInputElement)) {
+      throw new Error('expected file input')
+    }
+    expect(fileInput).toBeDisabled()
+
+    fireEvent.change(fileInput, {
+      target: {
+        files: [
+          new File([new Uint8Array([1])], 'extra.jpg', { type: 'image/jpeg' }),
+        ],
+      },
+    })
+
+    expect(mockedUpload).not.toHaveBeenCalled()
+    expect(toast.error).toHaveBeenCalledWith(
+      'A galeria já atingiu o limite de 40 imagens.',
+    )
+  })
+
+  it('exclui um item do rascunho e permite substituir a imagem mantendo os textos', async () => {
+    const user = userEvent.setup()
+    mockedFetch.mockResolvedValue(section)
+    mockedUpload.mockResolvedValue({
+      url: 'https://cdn.example.com/operations/replaced.webp',
+      pathname: 'path',
+      mimeType: 'image/webp',
+      sizeBytes: 12,
+      originalFilename: 'replaced.jpg',
+      index: 0,
+    })
+
+    renderEditor()
+    expect(await screen.findByText('Imagem 1')).toBeInTheDocument()
+
+    const secondItem = screen.getByTestId('operation-item-1')
+    await user.click(within(secondItem).getByRole('button', { name: 'Excluir' }))
+    expect(screen.queryByTestId('operation-item-5')).not.toBeInTheDocument()
+    expect(screen.getByText('5 / 40 imagens')).toBeInTheDocument()
+
+    const firstItem = screen.getByTestId('operation-item-0')
+    const replaceInput = firstItem.querySelector('input[type="file"]')
+    if (!(replaceInput instanceof HTMLInputElement)) {
+      throw new Error('expected replace file input')
+    }
+    const replacement = new File([new Uint8Array([9, 9])], 'replaced.jpg', {
+      type: 'image/jpeg',
+    })
+    await user.upload(replaceInput, replacement)
+
+    await waitFor(() => {
+      expect(mockedUpload).toHaveBeenCalled()
+    })
+    await waitFor(() => {
+      expect(within(firstItem).getByRole('img', { name: 'Alt 0' })).toHaveAttribute(
+        'src',
+        'https://cdn.example.com/operations/replaced.webp',
+      )
+    })
+    expect(within(firstItem).getByLabelText('Texto alternativo')).toHaveValue(
+      'Alt 0',
+    )
   })
 })

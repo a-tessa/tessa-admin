@@ -46,6 +46,7 @@ import { uploadOperationAsset } from '../operations.service'
 import type { OperationGalleryItem } from '../types'
 import { OperationGalleryItemCard } from './OperationGalleryItem'
 import { OperationSectionPreview } from './OperationSectionPreview'
+import { useRegisterPublicationEditorState } from '@/features/content/publish/publication-readiness'
 import {
   Alert,
   AlertDescription,
@@ -120,10 +121,28 @@ export function OperationSectionEditor() {
     })),
   )
   const isDirty: boolean = currentSignature !== baseline
+  const isUploading: boolean = items.some(
+    (item) => item.status === 'uploading',
+  )
+  const isInvalid: boolean =
+    items.some((item) => item.status === 'error') ||
+    (items.length > 0 &&
+      !operationSectionFormSchema.safeParse(
+        toOperationSectionInput(items),
+      ).success)
   const isBusy: boolean =
     saveMutation.isPending ||
     deleteMutation.isPending ||
-    items.some((item) => item.status === 'uploading')
+    isUploading
+
+  useRegisterPublicationEditorState({
+    id: 'homepage-operations',
+    label: 'Operações',
+    tab: 'operacoes',
+    isDirty,
+    isInvalid,
+    isUploading,
+  })
 
   useBlocker({
     shouldBlockFn: (): boolean =>
@@ -190,13 +209,19 @@ export function OperationSectionEditor() {
         alt: item.alt,
         caption: item.caption,
         status: 'uploading',
+        uploadProgress: 0,
         file,
       }
       return next
     })
 
     try {
-      const uploaded = await uploadOperationAsset(file, index)
+      const uploaded = await uploadOperationAsset(file, index, (percentage) => {
+        updateItem(clientId, (item) => ({
+          ...item,
+          uploadProgress: percentage,
+        }))
+      })
       updateItem(clientId, (item) => {
         if (item.previewUrl.startsWith('blob:') && item.previewUrl !== uploaded.url) {
           URL.revokeObjectURL(item.previewUrl)
@@ -208,6 +233,7 @@ export function OperationSectionEditor() {
           alt: item.alt,
           caption: item.caption,
           status: 'ready',
+          uploadProgress: 100,
           meta: {
             pathname: uploaded.pathname,
             mimeType: uploaded.mimeType,
@@ -258,6 +284,7 @@ export function OperationSectionEditor() {
       alt: '',
       caption: '',
       status: 'uploading',
+      uploadProgress: 0,
       file,
     }))
 

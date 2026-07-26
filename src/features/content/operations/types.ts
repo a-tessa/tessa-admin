@@ -38,6 +38,7 @@ export interface OperationGalleryItem {
   alt: string
   caption: string
   status: OperationUploadStatus
+  uploadProgress?: number
   errorMessage?: string
   file?: File
   meta?: OperationImageAssetMeta

@@ -62,6 +62,7 @@ export function OperationGalleryItemCard({
   const captionLength = item.caption.length
   const captionMatchesAlt =
     item.caption.trim().length > 0 && item.caption.trim() === item.alt.trim()
+  const uploadProgress = item.uploadProgress ?? 0
 
   return (
     <div
@@ -99,9 +100,17 @@ export function OperationGalleryItemCard({
             </div>
           )}
           {item.status === 'uploading' ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/70 text-sm">
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/80 px-4 text-sm">
               <Loader2 className="size-5 animate-spin" aria-hidden="true" />
-              Enviando…
+              <span className="font-medium tabular-nums">
+                Enviando {String(uploadProgress)}%
+              </span>
+              <progress
+                value={uploadProgress}
+                max={100}
+                aria-label={`Progresso do envio da imagem ${String(index + 1)}`}
+                className="h-1.5 w-full overflow-hidden rounded-full accent-primary"
+              />
             </div>
           ) : null}
         </div>
