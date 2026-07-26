@@ -233,7 +233,7 @@ function IndustryPreview({
           <div className="text-left">
             <h3
               id="industry-preview-title"
-              className="font-industry text-balance whitespace-pre-line text-3xl font-bold leading-tight uppercase text-foreground sm:text-4xl"
+              className="whitespace-pre-line font-industry text-3xl font-bold uppercase leading-tight text-foreground sm:text-4xl lg:text-[2.75rem]"
             >
               <span className="text-primary">
                 {titlePrefix || 'Prefixo do título'}
@@ -241,12 +241,12 @@ function IndustryPreview({
               {'\n'}
               {title || 'Título principal'}
             </h3>
-            <p className="mt-2 max-w-3xl text-pretty text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground sm:text-sm">
+            <p className="mt-2 max-w-3xl text-xs font-normal tracking-wide text-muted-foreground sm:text-sm">
               {subtitle || 'O subtítulo da seção aparecerá aqui.'}
             </p>
             <div
               aria-hidden="true"
-              className="mt-4 h-1 w-20 rounded-full bg-primary/70"
+              className="mt-4 h-1 w-20 rounded-full bg-chart-5"
             />
           </div>
 
