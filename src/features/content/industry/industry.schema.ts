@@ -106,7 +106,7 @@ export const industrySectionFormSchema = z
       .min(1, 'O subtítulo é obrigatório.')
       .max(
         MAX_INDUSTRY_SUBTITLE_LENGTH,
-        'O subtítulo deve ter no máximo 300 caracteres.',
+        'O subtítulo deve ter no máximo 700 caracteres.',
       ),
     videoUrl: z
       .string()
