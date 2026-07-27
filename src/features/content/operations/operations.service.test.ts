@@ -112,7 +112,9 @@ describe('serviço da seção Operações', () => {
     expect(mockedUploadRequest).toHaveBeenCalledTimes(1)
     const call = mockedUploadRequest.mock.calls[0]
     expect(call).toBeDefined()
-    const [path, formData, onProgress] = call ?? []
+    if (!call) throw new Error('Expected upload request call')
+
+    const [path, formData, onProgress] = call
     expect(path).toBe('/api/content/admin/operation-section/assets')
     expect(formData).toBeInstanceOf(FormData)
     expect(formData.get('file')).toBe(file)
