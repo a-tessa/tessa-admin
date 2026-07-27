@@ -210,6 +210,7 @@ function PageTitle() {
 
   if (path.startsWith('/dashboard')) return 'Visão geral'
   if (path === '/conteudo/pagina-inicial') return 'Página inicial'
+  if (path === '/conteudo/quem-somos') return 'Quem Somos'
   if (path === '/conteudo/categorias') return 'Categorias'
   if (path.startsWith('/conteudo/servicos')) return 'Serviços'
   if (path === '/conteudo/cenarios') return 'Cenários'

@@ -42,6 +42,7 @@ const ID_STRIPPED_COLLECTIONS = new Set([
 const SECTION_LABELS: ReadonlyArray<readonly [string, string]> = [
   ['heroSection', 'Seção Principal'],
   ['industrySection', 'Indústria'],
+  ['aboutSection', 'Quem Somos'],
   ['operationSection', 'Operações'],
   ['servicesPages', 'Serviços'],
   ['scenerySection', 'Cenários'],

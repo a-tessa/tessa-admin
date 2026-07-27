@@ -17,6 +17,7 @@ import {
   GalleryPage,
   validateGallerySearch,
 } from '@/features/content/gallery'
+import { AboutPage } from '@/features/content/about'
 import { validateHomePageSearch } from '@/features/content/homepage/homepage-search'
 import { HomePagePage } from '@/features/content/homepage/pages/HomePagePage'
 import { InstagramPage } from '@/features/content/instagram/pages/InstagramPage'
@@ -72,6 +73,12 @@ const contentHomepageRoute = createRoute({
   path: 'conteudo/pagina-inicial',
   validateSearch: validateHomePageSearch,
   component: HomePagePage,
+})
+
+const contentAboutRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'conteudo/quem-somos',
+  component: AboutPage,
 })
 
 const contentHeroRoute = createRoute({
@@ -190,6 +197,7 @@ export const routeTree = rootRoute.addChildren([
     dashboardRoute,
     contentRoute,
     contentHomepageRoute,
+    contentAboutRoute,
     contentHeroRoute,
     contentCategoriesRoute,
     contentServicesRoute,

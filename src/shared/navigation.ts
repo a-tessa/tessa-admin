@@ -54,6 +54,11 @@ export const navigationItems = [
         icon: 'image',
       },
       {
+        to: '/conteudo/quem-somos',
+        label: 'Quem Somos',
+        icon: 'building-2',
+      },
+      {
         to: '/conteudo/servicos',
         label: 'Serviços',
         icon: 'briefcase',
