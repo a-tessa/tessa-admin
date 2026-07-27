@@ -33,7 +33,7 @@ export const navigationItems = [
   {
     to: '/dashboard',
     label: 'Visão geral',
-    summary: 'Panorama do projeto e health check da API.',
+    summary: 'Indicadores do CMS, moderação e health check da API.',
     icon: 'layout-dashboard',
   },
   {
