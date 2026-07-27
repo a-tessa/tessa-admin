@@ -2,6 +2,8 @@ import type { PaginationMeta, PaginationParams } from '@/features/users/types'
 
 export type TestimonialStatus = 'pending' | 'approved' | 'rejected'
 
+export type TestimonialSource = 'submitted' | 'google'
+
 export interface AdminTestimonial {
   id: string
   authorName: string
@@ -15,6 +17,9 @@ export interface AdminTestimonial {
   reviewImageUrl: string | null
   reviewImagePathname: string | null
   status: TestimonialStatus
+  source: TestimonialSource
+  authorUrl: string | null
+  hidden: boolean
   createdAt: string
   reviewedAt: string | null
   reviewedById: string | null
@@ -46,4 +51,8 @@ export interface TestimonialStatsResponse {
 
 export interface ModerateTestimonialInput {
   status: Extract<TestimonialStatus, 'approved' | 'rejected'>
+}
+
+export interface SetTestimonialVisibilityInput {
+  hidden: boolean
 }

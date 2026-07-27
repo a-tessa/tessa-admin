@@ -1,8 +1,9 @@
-import { Check, Loader2, Star, Trash2, X } from 'lucide-react'
+import { Check, Eye, EyeOff, Loader2, Star, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { useDeleteTestimonial } from '../hooks/use-delete-testimonial'
 import { useModerateTestimonial } from '../hooks/use-moderate-testimonial'
+import { useSetTestimonialVisibility } from '../hooks/use-set-testimonial-visibility'
 import type { AdminTestimonial } from '../types'
 import {
   AlertDialog,
@@ -97,14 +98,41 @@ export function TestimonialReviewDialog({
 }: TestimonialReviewDialogProps) {
   const moderateMutation = useModerateTestimonial()
   const deleteMutation = useDeleteTestimonial()
+  const visibilityMutation = useSetTestimonialVisibility()
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   if (!testimonial) return null
 
   const statusBadge = statusConfig[testimonial.status]
-  const isPending = moderateMutation.isPending || deleteMutation.isPending
+  const isPending =
+    moderateMutation.isPending ||
+    deleteMutation.isPending ||
+    visibilityMutation.isPending
+  const isGoogle = testimonial.source === 'google'
   const canApprove = testimonial.status !== 'approved'
   const canReject = testimonial.status !== 'rejected'
+
+  function handleToggleVisibility() {
+    if (!testimonial) return
+
+    const nextHidden = !testimonial.hidden
+    visibilityMutation.mutate(
+      { id: testimonial.id, input: { hidden: nextHidden } },
+      {
+        onSuccess: () => {
+          toast.success(
+            nextHidden
+              ? 'Avaliação ocultada do site.'
+              : 'Avaliação reexibida no site.',
+          )
+          onOpenChange(false)
+        },
+        onError: (error) => {
+          toast.error(error.message)
+        },
+      },
+    )
+  }
 
   function handleModerate(status: 'approved' | 'rejected') {
     if (!testimonial) return
@@ -156,12 +184,27 @@ export function TestimonialReviewDialog({
                   landing.
                 </DialogDescription>
               </div>
-              <Badge
-                variant={statusBadge.variant}
-                className={cn('shrink-0', statusBadge.className)}
-              >
-                {statusBadge.label}
-              </Badge>
+              <div className="flex shrink-0 items-center gap-2">
+                {isGoogle ? (
+                  <Badge variant="outline" className="shrink-0">
+                    Via Google
+                  </Badge>
+                ) : null}
+                {testimonial.hidden ? (
+                  <Badge
+                    variant="outline"
+                    className="shrink-0 border-destructive/50 text-destructive"
+                  >
+                    Oculto
+                  </Badge>
+                ) : null}
+                <Badge
+                  variant={statusBadge.variant}
+                  className={cn('shrink-0', statusBadge.className)}
+                >
+                  {statusBadge.label}
+                </Badge>
+              </div>
             </div>
           </DialogHeader>
 
@@ -253,32 +296,52 @@ export function TestimonialReviewDialog({
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => handleModerate('rejected')}
-                disabled={isPending || !canReject}
+                onClick={handleToggleVisibility}
+                disabled={isPending}
                 className="gap-2"
               >
-                {moderateMutation.isPending &&
-                moderateMutation.variables.input.status === 'rejected' ? (
+                {visibilityMutation.isPending ? (
                   <Loader2 className="size-4 animate-spin" />
+                ) : testimonial.hidden ? (
+                  <Eye className="size-4" />
                 ) : (
-                  <X className="size-4" />
+                  <EyeOff className="size-4" />
                 )}
-                Rejeitar
+                {testimonial.hidden ? 'Reexibir' : 'Ocultar'}
               </Button>
-              <Button
-                type="button"
-                onClick={() => handleModerate('approved')}
-                disabled={isPending || !canApprove}
-                className="gap-2 bg-emerald-600 text-white hover:bg-emerald-600/90"
-              >
-                {moderateMutation.isPending &&
-                moderateMutation.variables.input.status === 'approved' ? (
-                  <Loader2 className="size-4 animate-spin" />
-                ) : (
-                  <Check className="size-4" />
-                )}
-                Aprovar e publicar
-              </Button>
+              {!isGoogle ? (
+                <>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => handleModerate('rejected')}
+                    disabled={isPending || !canReject}
+                    className="gap-2"
+                  >
+                    {moderateMutation.isPending &&
+                    moderateMutation.variables.input.status === 'rejected' ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <X className="size-4" />
+                    )}
+                    Rejeitar
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => handleModerate('approved')}
+                    disabled={isPending || !canApprove}
+                    className="gap-2 bg-emerald-600 text-white hover:bg-emerald-600/90"
+                  >
+                    {moderateMutation.isPending &&
+                    moderateMutation.variables.input.status === 'approved' ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Check className="size-4" />
+                    )}
+                    Aprovar e publicar
+                  </Button>
+                </>
+              ) : null}
             </div>
           </DialogFooter>
         </DialogContent>

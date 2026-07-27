@@ -309,7 +309,17 @@ export function TestimonialsPage() {
                         </AvatarFallback>
                       </Avatar>
                       <div className="min-w-0">
-                        <p className="truncate font-medium">{item.authorName}</p>
+                        <p className="flex items-center gap-1.5 truncate font-medium">
+                          {item.authorName}
+                          {item.source === 'google' ? (
+                            <Badge
+                              variant="outline"
+                              className="shrink-0 px-1.5 py-0 text-[10px] font-medium"
+                            >
+                              Google
+                            </Badge>
+                          ) : null}
+                        </p>
                         <p className="truncate text-xs text-muted-foreground">
                           {[item.authorRole, item.companyName]
                             .filter(Boolean)
@@ -343,9 +353,19 @@ export function TestimonialsPage() {
                     )}
                   </TableCell>
                   <TableCell>
-                    <Badge className={cn('shrink-0', badge.className)}>
-                      {badge.label}
-                    </Badge>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <Badge className={cn('shrink-0', badge.className)}>
+                        {badge.label}
+                      </Badge>
+                      {item.hidden ? (
+                        <Badge
+                          variant="outline"
+                          className="shrink-0 border-destructive/50 text-destructive"
+                        >
+                          Oculto
+                        </Badge>
+                      ) : null}
+                    </div>
                   </TableCell>
                   <TableCell className="hidden whitespace-nowrap text-sm text-muted-foreground md:table-cell">
                     {formatDateTime(item.createdAt)}

@@ -1,6 +1,7 @@
 import { authenticatedRequest } from '@/shared/lib/api'
 import type {
   ModerateTestimonialInput,
+  SetTestimonialVisibilityInput,
   TestimonialItemResponse,
   TestimonialListParams,
   TestimonialStatsResponse,
@@ -42,6 +43,16 @@ export async function moderateTestimonial(
 ): Promise<TestimonialItemResponse> {
   return authenticatedRequest<TestimonialItemResponse>(
     `${BASE_PATH}/${id}/moderation`,
+    { method: 'PATCH', body: JSON.stringify(input) },
+  )
+}
+
+export async function setTestimonialVisibility(
+  id: string,
+  input: SetTestimonialVisibilityInput,
+): Promise<TestimonialItemResponse> {
+  return authenticatedRequest<TestimonialItemResponse>(
+    `${BASE_PATH}/${id}/visibility`,
     { method: 'PATCH', body: JSON.stringify(input) },
   )
 }
