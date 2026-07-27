@@ -59,9 +59,19 @@ export interface BlogArticleFormInput {
   removeHeaderImage: boolean
 }
 
+export type BlogListOrder = 'asc' | 'desc'
+
+export type BlogListSortBy = 'updatedAt' | 'publishedAt'
+
 export interface AdminBlogListParams {
   status?: BlogArticleStatus
   categorySlug?: string
+  /** Case-insensitive title search. */
+  q?: string
+  /** Sort direction: desc = newest first, asc = oldest first. */
+  order?: BlogListOrder
+  /** Which date column to sort by. */
+  sortBy?: BlogListSortBy
   page?: number
   perPage?: number
 }

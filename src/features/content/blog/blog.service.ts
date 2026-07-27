@@ -15,6 +15,9 @@ function buildQueryString(params: AdminBlogListParams): string {
 
   if (params.status) search.set('status', params.status)
   if (params.categorySlug) search.set('categorySlug', params.categorySlug)
+  if (params.q) search.set('q', params.q)
+  if (params.order) search.set('order', params.order)
+  if (params.sortBy) search.set('sortBy', params.sortBy)
   if (params.page !== undefined) search.set('page', String(params.page))
   if (params.perPage !== undefined)
     search.set('perPage', String(params.perPage))

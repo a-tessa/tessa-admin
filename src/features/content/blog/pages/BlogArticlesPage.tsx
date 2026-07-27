@@ -8,6 +8,7 @@ import {
   Newspaper,
   Pencil,
   Plus,
+  Search,
   Trash2,
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
@@ -38,6 +39,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu'
+import { Input } from '@/shared/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -60,10 +62,16 @@ import { useAdminBlogArticles } from '../hooks/use-admin-blog-articles'
 import { useBulkDeleteBlogArticles } from '../hooks/use-bulk-delete-blog-articles'
 import { useDeleteBlogArticle } from '../hooks/use-delete-blog-article'
 import { useUpdateBlogArticleStatus } from '../hooks/use-update-blog-article-status'
-import type { BlogArticleAdminListItem, BlogArticleStatus } from '../types'
+import type {
+  BlogArticleAdminListItem,
+  BlogArticleStatus,
+  BlogListOrder,
+  BlogListSortBy,
+} from '../types'
 
 const ALL_VALUE = '__all__'
 const PER_PAGE = 20
+const SEARCH_DEBOUNCE_MS = 300
 
 type StatusFilterValue = BlogArticleStatus | typeof ALL_VALUE
 
@@ -89,16 +97,25 @@ export function BlogArticlesPage() {
   const [page, setPage] = useState(1)
   const [statusFilter, setStatusFilter] = useState<StatusFilterValue>(ALL_VALUE)
   const [categoryFilter, setCategoryFilter] = useState(ALL_VALUE)
+  const [searchInput, setSearchInput] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [order, setOrder] = useState<BlogListOrder>('desc')
+  const [sortBy, setSortBy] = useState<BlogListSortBy>('publishedAt')
   const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(new Set())
   const [deletingArticle, setDeletingArticle] =
     useState<BlogArticleAdminListItem | null>(null)
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false)
 
+  const trimmedSearch = debouncedSearch.trim()
+
   const articlesQuery = useAdminBlogArticles({
     page,
     perPage: PER_PAGE,
+    order,
+    sortBy,
     ...(statusFilter !== ALL_VALUE ? { status: statusFilter } : {}),
     ...(categoryFilter !== ALL_VALUE ? { categorySlug: categoryFilter } : {}),
+    ...(trimmedSearch.length > 0 ? { q: trimmedSearch } : {}),
   })
   const categoriesQuery = useQuery(categoriesListQuery())
   const deleteMutation = useDeleteBlogArticle()
@@ -129,9 +146,17 @@ export function BlogArticlesPage() {
   )
 
   useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedSearch(searchInput)
+    }, SEARCH_DEBOUNCE_MS)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [searchInput])
+
+  useEffect(() => {
     setSelectedSlugs(new Set())
     setPage(1)
-  }, [statusFilter, categoryFilter])
+  }, [statusFilter, categoryFilter, debouncedSearch, order, sortBy])
 
   function toggleArticleSelection(slug: string, checked: boolean) {
     setSelectedSlugs((current) => {
@@ -210,6 +235,12 @@ export function BlogArticlesPage() {
 
   const hasArticles = articles.length > 0
   const hasSelection = selectedSlugs.size > 0
+  const hasActiveFilters =
+    statusFilter !== ALL_VALUE ||
+    categoryFilter !== ALL_VALUE ||
+    trimmedSearch.length > 0 ||
+    sortBy !== 'publishedAt' ||
+    order !== 'desc'
 
   return (
     <div className="space-y-6">
@@ -230,6 +261,21 @@ export function BlogArticlesPage() {
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
+        <div className="relative min-w-[220px] flex-1 sm:max-w-xs">
+          <label htmlFor="blog-search" className="sr-only">
+            Pesquisar por título
+          </label>
+          <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            id="blog-search"
+            value={searchInput}
+            onChange={(event) => setSearchInput(event.target.value)}
+            placeholder="Pesquisar por título…"
+            className="pl-9"
+            autoComplete="off"
+          />
+        </div>
+
         <div className="flex items-center gap-2">
           <label
             htmlFor="blog-status-filter"
@@ -276,13 +322,59 @@ export function BlogArticlesPage() {
           </Select>
         </div>
 
-        {statusFilter !== ALL_VALUE || categoryFilter !== ALL_VALUE ? (
+        <div className="flex items-center gap-2">
+          <label
+            htmlFor="blog-sort-by-filter"
+            className="text-sm font-medium text-muted-foreground"
+          >
+            Ordenar por
+          </label>
+          <Select
+            value={sortBy}
+            onValueChange={(value) => setSortBy(value as BlogListSortBy)}
+          >
+            <SelectTrigger id="blog-sort-by-filter" className="w-[180px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="publishedAt">Publicação</SelectItem>
+              <SelectItem value="updatedAt">Atualização</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <label
+            htmlFor="blog-order-filter"
+            className="text-sm font-medium text-muted-foreground"
+          >
+            Ordem
+          </label>
+          <Select
+            value={order}
+            onValueChange={(value) => setOrder(value as BlogListOrder)}
+          >
+            <SelectTrigger id="blog-order-filter" className="w-[180px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="desc">Mais recentes</SelectItem>
+              <SelectItem value="asc">Mais antigos</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {hasActiveFilters || searchInput.trim().length > 0 ? (
           <Button
             variant="ghost"
             size="sm"
             onClick={() => {
               setStatusFilter(ALL_VALUE)
               setCategoryFilter(ALL_VALUE)
+              setSearchInput('')
+              setDebouncedSearch('')
+              setSortBy('publishedAt')
+              setOrder('desc')
             }}
           >
             Limpar filtros
@@ -378,13 +470,34 @@ export function BlogArticlesPage() {
         <Card>
           <CardContent className="flex flex-col items-center gap-3 py-12">
             <Newspaper className="size-10 text-muted-foreground" />
-            <p className="text-muted-foreground">Nenhum artigo encontrado.</p>
-            <Button asChild className="mt-2 gap-2">
-              <Link to="/conteudo/blog/novo">
-                <Plus className="size-4" />
-                Criar primeiro artigo
-              </Link>
-            </Button>
+            <p className="text-muted-foreground">
+              {hasActiveFilters
+                ? 'Nenhum artigo corresponde aos filtros.'
+                : 'Nenhum artigo encontrado.'}
+            </p>
+            {hasActiveFilters ? (
+              <Button
+                variant="outline"
+                className="mt-2"
+                onClick={() => {
+                  setStatusFilter(ALL_VALUE)
+                  setCategoryFilter(ALL_VALUE)
+                  setSearchInput('')
+                  setDebouncedSearch('')
+                  setSortBy('publishedAt')
+                  setOrder('desc')
+                }}
+              >
+                Limpar filtros
+              </Button>
+            ) : (
+              <Button asChild className="mt-2 gap-2">
+                <Link to="/conteudo/blog/novo">
+                  <Plus className="size-4" />
+                  Criar primeiro artigo
+                </Link>
+              </Button>
+            )}
           </CardContent>
         </Card>
       ) : null}
