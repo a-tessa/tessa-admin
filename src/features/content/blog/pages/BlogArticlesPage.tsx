@@ -261,7 +261,7 @@ export function BlogArticlesPage() {
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <div className="relative min-w-[220px] flex-1 sm:max-w-xs">
+        <div className="relative min-w-55 flex-1 sm:max-w-xs">
           <label htmlFor="blog-search" className="sr-only">
             Pesquisar por título
           </label>
@@ -289,7 +289,7 @@ export function BlogArticlesPage() {
               setStatusFilter(value as StatusFilterValue)
             }
           >
-            <SelectTrigger id="blog-status-filter" className="w-[180px]">
+            <SelectTrigger id="blog-status-filter" className="w-45">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -308,7 +308,7 @@ export function BlogArticlesPage() {
             Categoria
           </label>
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger id="blog-category-filter" className="w-[220px]">
+            <SelectTrigger id="blog-category-filter" className="w-55">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -333,7 +333,7 @@ export function BlogArticlesPage() {
             value={sortBy}
             onValueChange={(value) => setSortBy(value as BlogListSortBy)}
           >
-            <SelectTrigger id="blog-sort-by-filter" className="w-[180px]">
+            <SelectTrigger id="blog-sort-by-filter" className="w-45">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -354,7 +354,7 @@ export function BlogArticlesPage() {
             value={order}
             onValueChange={(value) => setOrder(value as BlogListOrder)}
           >
-            <SelectTrigger id="blog-order-filter" className="w-[180px]">
+            <SelectTrigger id="blog-order-filter" className="w-45">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
