@@ -27,6 +27,24 @@ export interface MeResponse {
   user: AuthUser | null
 }
 
+export interface MessageResponse {
+  message: string
+}
+
+export interface ChangePasswordInput {
+  currentPassword: string
+  newPassword: string
+}
+
+export interface ForgotPasswordInput {
+  email: string
+}
+
+export interface ResetPasswordInput {
+  token: string
+  newPassword: string
+}
+
 export type AuthStatus = 'checking' | 'authenticated' | 'anonymous'
 
 export interface AuthSession {

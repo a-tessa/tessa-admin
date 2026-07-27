@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 import { useAuth } from '@/features/auth/use-auth'
 import { ProfileAvatarField } from '@/features/profile/components/ProfileAvatarField'
+import { ChangePasswordCard } from '@/features/profile/components/ChangePasswordCard'
 import { useUpdateProfile } from '@/features/profile/hooks/use-update-profile'
 import { Badge } from '@/shared/components/ui/badge'
 import { Button } from '@/shared/components/ui/button'
@@ -130,7 +131,7 @@ export function ProfilePage() {
       <div>
         <h2 className="text-2xl font-semibold tracking-tight">Meu perfil</h2>
         <p className="text-sm text-muted-foreground">
-          Atualize sua foto, nome, email, CPF e telefone de acesso.
+          Atualize sua foto, nome, email, CPF, telefone e senha.
         </p>
       </div>
 
@@ -259,6 +260,8 @@ export function ProfilePage() {
           </Form>
         </CardContent>
       </Card>
+
+      <ChangePasswordCard />
     </div>
   )
 }

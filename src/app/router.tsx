@@ -6,7 +6,9 @@ import {
   createRouter,
 } from '@tanstack/react-router'
 import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute'
+import { ForgotPasswordPage } from '@/features/auth/pages/ForgotPasswordPage'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
+import { ResetPasswordPage } from '@/features/auth/pages/ResetPasswordPage'
 import { BlogArticleCreatePage } from '@/features/content/blog/pages/BlogArticleCreatePage'
 import { BlogArticleEditPage } from '@/features/content/blog/pages/BlogArticleEditPage'
 import { BlogArticlesPage } from '@/features/content/blog/pages/BlogArticlesPage'
@@ -42,6 +44,21 @@ const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: 'login',
   component: LoginPage,
+})
+
+const forgotPasswordRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'esqueci-senha',
+  component: ForgotPasswordPage,
+})
+
+const resetPasswordRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'redefinir-senha',
+  validateSearch: (search: Record<string, unknown>) => ({
+    token: typeof search.token === 'string' ? search.token : '',
+  }),
+  component: ResetPasswordPage,
 })
 
 const appRoute = createRoute({
@@ -192,6 +209,8 @@ const profileRoute = createRoute({
 
 export const routeTree = rootRoute.addChildren([
   loginRoute,
+  forgotPasswordRoute,
+  resetPasswordRoute,
   appRoute.addChildren([
     indexRoute,
     dashboardRoute,
