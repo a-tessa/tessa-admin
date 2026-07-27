@@ -38,6 +38,20 @@ describe('navegação da Página inicial', () => {
     ).toBe(false)
   })
 
+  it('oferece Imagens dos cabeçalhos dentro de Conteúdos', () => {
+    const contentItem = navigationItems.find(
+      (item) => item.label === 'Conteúdos',
+    )
+
+    expect(
+      contentItem?.children?.some(
+        (item) =>
+          item.to === '/conteudo/imagens-cabecalhos' &&
+          item.label === 'Imagens dos cabeçalhos',
+      ),
+    ).toBe(true)
+  })
+
   it('redireciona o endereço legado para a aba Seção Principal', async () => {
     const router = createRouter({
       routeTree,

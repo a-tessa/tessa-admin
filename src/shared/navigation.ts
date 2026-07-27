@@ -98,6 +98,11 @@ export const navigationItems = [
         label: 'Galeria',
         icon: 'image',
       },
+      {
+        to: '/conteudo/imagens-cabecalhos',
+        label: 'Imagens dos cabeçalhos',
+        icon: 'image',
+      },
     ],
   },
   {

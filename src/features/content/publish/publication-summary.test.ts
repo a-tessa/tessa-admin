@@ -105,4 +105,21 @@ describe('resumo de publicação', () => {
       'Instagram',
     ])
   })
+
+  it('nomeia alterações das imagens dos cabeçalhos', () => {
+    const summary = buildPublicationSummary(
+      {
+        headingImages: {
+          blog: { url: 'https://cdn.example.com/blog.webp' },
+        },
+      },
+      {
+        headingImages: {},
+      },
+    )
+
+    expect(summary.changedSections.map((section) => section.label)).toEqual([
+      'Imagens dos cabeçalhos',
+    ])
+  })
 })

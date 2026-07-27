@@ -44,6 +44,7 @@ const SECTION_LABELS: ReadonlyArray<readonly [string, string]> = [
   ['industrySection', 'Indústria'],
   ['aboutSection', 'Quem Somos'],
   ['operationSection', 'Operações'],
+  ['headingImages', 'Imagens dos cabeçalhos'],
   ['servicesPages', 'Serviços'],
   ['scenerySection', 'Cenários'],
   ['clients', 'Clientes'],

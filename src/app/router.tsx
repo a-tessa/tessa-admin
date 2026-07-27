@@ -20,6 +20,7 @@ import {
   validateGallerySearch,
 } from '@/features/content/gallery'
 import { AboutPage } from '@/features/content/about'
+import { HeadingImagesPage } from '@/features/content/heading-images'
 import { validateHomePageSearch } from '@/features/content/homepage/homepage-search'
 import { HomePagePage } from '@/features/content/homepage/pages/HomePagePage'
 import { InstagramPage } from '@/features/content/instagram/pages/InstagramPage'
@@ -56,7 +57,7 @@ const resetPasswordRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: 'redefinir-senha',
   validateSearch: (search: Record<string, unknown>) => ({
-    token: typeof search.token === 'string' ? search.token : '',
+    token: typeof search['token'] === 'string' ? search['token'] : '',
   }),
   component: ResetPasswordPage,
 })
@@ -165,6 +166,12 @@ const contentInstagramRoute = createRoute({
   component: InstagramPage,
 })
 
+const contentHeadingImagesRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'conteudo/imagens-cabecalhos',
+  component: HeadingImagesPage,
+})
+
 const contentBlogCreateRoute = createRoute({
   getParentRoute: () => appRoute,
   path: 'conteudo/blog/novo',
@@ -227,6 +234,7 @@ export const routeTree = rootRoute.addChildren([
     contentDocumentsRoute,
     contentGalleryRoute,
     contentInstagramRoute,
+    contentHeadingImagesRoute,
     contentBlogCreateRoute,
     contentBlogEditRoute,
     contentEditRoute,
