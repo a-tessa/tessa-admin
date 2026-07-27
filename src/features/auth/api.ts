@@ -13,14 +13,20 @@ export function getCurrentUser(accessToken: string) {
   return apiRequest<MeResponse>('/api/auth/me', {}, accessToken)
 }
 
+function appendProfileFields(formData: FormData, input: UpdateProfileInput) {
+  formData.append('name', input.name)
+  formData.append('email', input.email)
+  formData.append('cpf', input.cpf)
+  formData.append('phone', input.phone)
+}
+
 export function updateProfile(input: UpdateProfileInput) {
   const hasAvatar = input.avatar instanceof File
   const hasRemoveAvatar = input.removeAvatar === true
 
   if (hasAvatar || hasRemoveAvatar) {
     const formData = new FormData()
-    formData.append('name', input.name)
-    formData.append('email', input.email)
+    appendProfileFields(formData, input)
 
     if (hasAvatar) {
       formData.append('avatar', input.avatar ?? '')
@@ -41,6 +47,8 @@ export function updateProfile(input: UpdateProfileInput) {
     body: JSON.stringify({
       name: input.name,
       email: input.email,
+      cpf: input.cpf,
+      phone: input.phone,
     }),
   })
 }

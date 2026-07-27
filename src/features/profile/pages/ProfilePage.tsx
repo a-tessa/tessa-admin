@@ -26,10 +26,30 @@ import {
 } from '@/shared/components/ui/form'
 import { Input } from '@/shared/components/ui/input'
 import { Skeleton } from '@/shared/components/ui/skeleton'
+import {
+  formatBrazilPhoneDisplay,
+  formatCpfDisplay,
+  isValidBrazilPhone,
+  isValidCpf,
+  normalizeBrazilPhoneDigits,
+  normalizeCpfDigits,
+} from '@/shared/lib/brazil-ids'
 
 const profileSchema = z.object({
   name: z.string().min(2, 'Nome precisa ter ao menos 2 caracteres.'),
   email: z.email('Email inválido.'),
+  cpf: z
+    .string()
+    .refine(
+      (value) => value.trim().length === 0 || isValidCpf(value),
+      'CPF inválido.',
+    ),
+  phone: z
+    .string()
+    .refine(
+      (value) => value.trim().length === 0 || isValidBrazilPhone(value),
+      'Telefone inválido.',
+    ),
 })
 
 type ProfileFormValues = z.infer<typeof profileSchema>
@@ -45,6 +65,8 @@ export function ProfilePage() {
     defaultValues: {
       name: '',
       email: '',
+      cpf: '',
+      phone: '',
     },
   })
 
@@ -54,6 +76,10 @@ export function ProfilePage() {
     form.reset({
       name: session.user.name,
       email: session.user.email,
+      cpf: session.user.cpf ? formatCpfDisplay(session.user.cpf) : '',
+      phone: session.user.phone
+        ? formatBrazilPhoneDisplay(session.user.phone)
+        : '',
     })
     setAvatarFile(null)
     setRemoveAvatar(false)
@@ -64,6 +90,11 @@ export function ProfilePage() {
       {
         name: values.name,
         email: values.email,
+        cpf: values.cpf.trim().length > 0 ? normalizeCpfDigits(values.cpf) : '',
+        phone:
+          values.phone.trim().length > 0
+            ? formatBrazilPhoneDisplay(values.phone)
+            : '',
         avatar: avatarFile,
         removeAvatar,
       },
@@ -99,7 +130,7 @@ export function ProfilePage() {
       <div>
         <h2 className="text-2xl font-semibold tracking-tight">Meu perfil</h2>
         <p className="text-sm text-muted-foreground">
-          Atualize sua foto, nome e email de acesso.
+          Atualize sua foto, nome, email, CPF e telefone de acesso.
         </p>
       </div>
 
@@ -164,6 +195,57 @@ export function ProfilePage() {
                   </FormItem>
                 )}
               />
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="cpf"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>CPF</FormLabel>
+                      <FormControl>
+                        <Input
+                          inputMode="numeric"
+                          autoComplete="off"
+                          placeholder="000.000.000-00"
+                          {...field}
+                          onChange={(event) => {
+                            field.onChange(formatCpfDisplay(event.target.value))
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Telefone</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="tel"
+                          inputMode="tel"
+                          autoComplete="tel"
+                          placeholder="(00) 00000-0000"
+                          {...field}
+                          onChange={(event) => {
+                            field.onChange(
+                              formatBrazilPhoneDisplay(
+                                normalizeBrazilPhoneDigits(event.target.value),
+                              ),
+                            )
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <div className="flex justify-end">
                 <Button type="submit" disabled={updateMutation.isPending} className="gap-2">

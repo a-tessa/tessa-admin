@@ -112,6 +112,8 @@ export function UsersPage() {
         input: {
           name: data.name,
           email: data.email,
+          cpf: data.cpf,
+          phone: data.phone,
           avatar: data.avatar,
           removeAvatar: data.removeAvatar,
         },
@@ -123,6 +125,8 @@ export function UsersPage() {
               ...session.user,
               name: response.user.name,
               email: response.user.email,
+              cpf: response.user.cpf,
+              phone: response.user.phone,
               avatarUrl: response.user.avatarUrl,
             })
           }
@@ -266,6 +270,7 @@ export function UsersPage() {
             <TableRow>
               <TableHead>Usuário</TableHead>
               <TableHead>Email</TableHead>
+              <TableHead>Telefone</TableHead>
               <TableHead>Papel</TableHead>
               <TableHead>Ativo</TableHead>
               <TableHead>Criado em</TableHead>
@@ -278,16 +283,18 @@ export function UsersPage() {
                 <TableRow key={i}>
                   <TableCell><Skeleton className="h-4 w-32" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-40" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-28" /></TableCell>
                   <TableCell><Skeleton className="h-5 w-16" /></TableCell>
                   <TableCell><Skeleton className="h-5 w-10" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                  <TableCell><Skeleton className="ml-auto h-8 w-8" /></TableCell>
                 </TableRow>
               ))
             ) : null}
 
             {usersQuery.isSuccess && usersQuery.data.users.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-32 text-center">
+                <TableCell colSpan={7} className="h-32 text-center">
                   <div className="flex flex-col items-center gap-2 text-muted-foreground">
                     <Users className="size-8" />
                     <p>Nenhum usuário encontrado.</p>
@@ -315,6 +322,9 @@ export function UsersPage() {
                     </div>
                   </TableCell>
                   <TableCell className="text-muted-foreground">{user.email}</TableCell>
+                  <TableCell className="tabular-nums text-muted-foreground">
+                    {user.phone ?? '—'}
+                  </TableCell>
                   <TableCell>
                     <Badge variant={roleConfig.variant}>{roleConfig.label}</Badge>
                   </TableCell>

@@ -5,6 +5,8 @@ export interface User {
   name: string
   email: string
   role: UserRole
+  cpf: string | null
+  phone: string | null
   avatarUrl: string | null
   isActive: boolean
   createdAt: string
@@ -45,6 +47,8 @@ export interface UpdateUserStatusResponse {
 export interface UpdateUserInput {
   name: string
   email: string
+  cpf: string
+  phone: string
   avatar?: File | null
   removeAvatar?: boolean
 }

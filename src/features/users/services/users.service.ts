@@ -41,6 +41,13 @@ export async function updateUserStatus(
   )
 }
 
+function appendUserFields(formData: FormData, input: UpdateUserInput) {
+  formData.append('name', input.name)
+  formData.append('email', input.email)
+  formData.append('cpf', input.cpf)
+  formData.append('phone', input.phone)
+}
+
 export async function updateUser(
   id: string,
   input: UpdateUserInput,
@@ -50,8 +57,7 @@ export async function updateUser(
 
   if (hasAvatar || hasRemoveAvatar) {
     const formData = new FormData()
-    formData.append('name', input.name)
-    formData.append('email', input.email)
+    appendUserFields(formData, input)
 
     if (hasAvatar) {
       formData.append('avatar', input.avatar ?? '')
@@ -72,6 +78,8 @@ export async function updateUser(
     body: JSON.stringify({
       name: input.name,
       email: input.email,
+      cpf: input.cpf,
+      phone: input.phone,
     }),
   })
 }

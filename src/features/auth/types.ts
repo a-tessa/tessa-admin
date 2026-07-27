@@ -5,6 +5,8 @@ export interface AuthUser {
   name: string
   email: string
   role: UserRole
+  cpf?: string | null
+  phone?: string | null
   avatarUrl?: string | null
   isActive?: boolean
   createdAt?: string

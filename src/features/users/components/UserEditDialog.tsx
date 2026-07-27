@@ -23,11 +23,31 @@ import {
   FormMessage,
 } from '@/shared/components/ui/form'
 import { Input } from '@/shared/components/ui/input'
+import {
+  formatBrazilPhoneDisplay,
+  formatCpfDisplay,
+  isValidBrazilPhone,
+  isValidCpf,
+  normalizeBrazilPhoneDigits,
+  normalizeCpfDigits,
+} from '@/shared/lib/brazil-ids'
 import type { User } from '../types'
 
 const editUserSchema = z.object({
   name: z.string().min(2, 'Nome precisa ter ao menos 2 caracteres.'),
   email: z.email('Email inválido.'),
+  cpf: z
+    .string()
+    .refine(
+      (value) => value.trim().length === 0 || isValidCpf(value),
+      'CPF inválido.',
+    ),
+  phone: z
+    .string()
+    .refine(
+      (value) => value.trim().length === 0 || isValidBrazilPhone(value),
+      'Telefone inválido.',
+    ),
 })
 
 type EditUserFormValues = z.infer<typeof editUserSchema>
@@ -35,6 +55,8 @@ type EditUserFormValues = z.infer<typeof editUserSchema>
 export interface UserEditSubmitData {
   name: string
   email: string
+  cpf: string
+  phone: string
   avatar: File | null
   removeAvatar: boolean
 }
@@ -62,6 +84,8 @@ export function UserEditDialog({
     defaultValues: {
       name: '',
       email: '',
+      cpf: '',
+      phone: '',
     },
   })
 
@@ -71,6 +95,8 @@ export function UserEditDialog({
     form.reset({
       name: user.name,
       email: user.email,
+      cpf: user.cpf ? formatCpfDisplay(user.cpf) : '',
+      phone: user.phone ? formatBrazilPhoneDisplay(user.phone) : '',
     })
     setAvatarFile(null)
     setRemoveAvatar(false)
@@ -80,6 +106,11 @@ export function UserEditDialog({
     onSubmit({
       name: values.name,
       email: values.email,
+      cpf: values.cpf.trim().length > 0 ? normalizeCpfDigits(values.cpf) : '',
+      phone:
+        values.phone.trim().length > 0
+          ? formatBrazilPhoneDisplay(values.phone)
+          : '',
       avatar: avatarFile,
       removeAvatar,
     })
@@ -91,7 +122,7 @@ export function UserEditDialog({
         <DialogHeader>
           <DialogTitle>Editar usuário</DialogTitle>
           <DialogDescription>
-            Atualize a foto, nome e email do usuário selecionado.
+            Atualize a foto, nome, email, CPF e telefone do usuário selecionado.
           </DialogDescription>
         </DialogHeader>
 
@@ -145,6 +176,57 @@ export function UserEditDialog({
                 </FormItem>
               )}
             />
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="cpf"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>CPF</FormLabel>
+                    <FormControl>
+                      <Input
+                        inputMode="numeric"
+                        autoComplete="off"
+                        placeholder="000.000.000-00"
+                        {...field}
+                        onChange={(event) => {
+                          field.onChange(formatCpfDisplay(event.target.value))
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Telefone</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="tel"
+                        inputMode="tel"
+                        autoComplete="tel"
+                        placeholder="(00) 00000-0000"
+                        {...field}
+                        onChange={(event) => {
+                          field.onChange(
+                            formatBrazilPhoneDisplay(
+                              normalizeBrazilPhoneDigits(event.target.value),
+                            ),
+                          )
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
