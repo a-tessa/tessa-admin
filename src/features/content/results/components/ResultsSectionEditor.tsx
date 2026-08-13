@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   defaultResultsSectionFormValues,
-  RESULTS_STAT_LABELS,
+  RESULTS_STAT_FIELDS,
   resultsSectionFormSchema,
   toResultsSectionFormValues,
   toResultsSectionInput,
@@ -205,11 +205,11 @@ export function ResultsSectionEditor() {
               </Alert>
             ) : null}
 
-            {RESULTS_STAT_LABELS.map((label, index) => (
+            {RESULTS_STAT_FIELDS.map(({ name, label }) => (
               <FormField
-                key={label}
+                key={name}
                 control={form.control}
-                name={`values.${index}` as const}
+                name={name}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{label}</FormLabel>
@@ -221,10 +221,6 @@ export function ResultsSectionEditor() {
                         step={1}
                         className="max-w-xs"
                         {...field}
-                        value={field.value}
-                        onChange={(event): void => {
-                          field.onChange(event.target.value)
-                        }}
                       />
                     </FormControl>
                     <FormDescription>

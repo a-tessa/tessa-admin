@@ -10,47 +10,75 @@ export const RESULTS_STAT_LABELS = [
   'anos de experiência em engenharia estrutural',
 ] as const
 
+/**
+ * Caminhos fixos do tuple. Um nome montado em tempo de execução não é aceito
+ * pelo tipo do campo, que só admite estes três.
+ */
+export const RESULTS_STAT_FIELDS = [
+  { name: 'values.0', label: RESULTS_STAT_LABELS[0] },
+  { name: 'values.1', label: RESULTS_STAT_LABELS[1] },
+  { name: 'values.2', label: RESULTS_STAT_LABELS[2] },
+] as const
+
+const INVALID_STAT_MESSAGE = 'Informe um número inteiro ≥ 0.'
+
+// O campo do formulário guarda texto, como o input entrega. A conversão para
+// número acontece só na borda da API, em toResultsSectionInput.
+const statValueSchema = z
+  .string()
+  .trim()
+  .min(1, INVALID_STAT_MESSAGE)
+  .regex(/^\d+$/, INVALID_STAT_MESSAGE)
+
 export const resultsSectionFormSchema = z.object({
-  values: z.tuple([
-    z.coerce.number().int().nonnegative('Informe um número inteiro ≥ 0.'),
-    z.coerce.number().int().nonnegative('Informe um número inteiro ≥ 0.'),
-    z.coerce.number().int().nonnegative('Informe um número inteiro ≥ 0.'),
-  ]),
+  values: z.tuple([statValueSchema, statValueSchema, statValueSchema]),
 })
 
 export type ResultsSectionFormValues = z.infer<typeof resultsSectionFormSchema>
 
 export const defaultResultsSectionFormValues: ResultsSectionFormValues = {
-  values: [...DEFAULT_RESULTS_VALUES],
+  values: [
+    String(DEFAULT_RESULTS_VALUES[0]),
+    String(DEFAULT_RESULTS_VALUES[1]),
+    String(DEFAULT_RESULTS_VALUES[2]),
+  ],
+}
+
+function isNonNegativeInteger(value: number): boolean {
+  return Number.isInteger(value) && value >= 0
 }
 
 export function toResultsSectionFormValues(
   section: { values: number[] } | null,
 ): ResultsSectionFormValues {
+  const values = section?.values ?? []
+  const [first, second, third] = values
+
   if (
-    section &&
-    Array.isArray(section.values) &&
-    section.values.length === RESULTS_SECTION_STAT_COUNT &&
-    section.values.every(
-      (value) => Number.isInteger(value) && value >= 0,
-    )
+    values.length !== RESULTS_SECTION_STAT_COUNT ||
+    first === undefined ||
+    second === undefined ||
+    third === undefined ||
+    !isNonNegativeInteger(first) ||
+    !isNonNegativeInteger(second) ||
+    !isNonNegativeInteger(third)
   ) {
-    return {
-      values: [
-        section.values[0]!,
-        section.values[1]!,
-        section.values[2]!,
-      ],
-    }
+    return defaultResultsSectionFormValues
   }
 
-  return defaultResultsSectionFormValues
+  return {
+    values: [String(first), String(second), String(third)],
+  }
 }
 
-export function toResultsSectionInput(
-  values: ResultsSectionFormValues,
-): { values: [number, number, number] } {
+export function toResultsSectionInput(values: ResultsSectionFormValues): {
+  values: [number, number, number]
+} {
   return {
-    values: [values.values[0], values.values[1], values.values[2]],
+    values: [
+      Number(values.values[0]),
+      Number(values.values[1]),
+      Number(values.values[2]),
+    ],
   }
 }

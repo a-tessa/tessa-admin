@@ -15,8 +15,23 @@ describe('results.schema', () => {
   it('converte o formulário para o payload da API', () => {
     expect(
       toResultsSectionInput({
-        values: [10, 300, 25],
+        values: ['10', '300', '25'],
       }),
     ).toEqual({ values: [10, 300, 25] })
+  })
+
+  it('carrega os valores salvos como texto para os campos', () => {
+    expect(toResultsSectionFormValues({ values: [10, 300, 25] })).toEqual({
+      values: ['10', '300', '25'],
+    })
+  })
+
+  it('cai nos defaults quando os valores salvos são inválidos', () => {
+    expect(toResultsSectionFormValues({ values: [10, -1, 25] })).toEqual(
+      defaultResultsSectionFormValues,
+    )
+    expect(toResultsSectionFormValues({ values: [10, 300] })).toEqual(
+      defaultResultsSectionFormValues,
+    )
   })
 })
