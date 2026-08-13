@@ -99,6 +99,18 @@ const contentAboutRoute = createRoute({
   component: AboutPage,
 })
 
+const contentFooterRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'conteudo/rodape',
+  component: () => (
+    <Navigate
+      to="/conteudo/pagina-inicial"
+      search={{ aba: 'rodape' }}
+      replace
+    />
+  ),
+})
+
 const contentHeroRoute = createRoute({
   getParentRoute: () => appRoute,
   path: 'conteudo/hero',
@@ -224,6 +236,7 @@ export const routeTree = rootRoute.addChildren([
     contentRoute,
     contentHomepageRoute,
     contentAboutRoute,
+    contentFooterRoute,
     contentHeroRoute,
     contentCategoriesRoute,
     contentServicesRoute,

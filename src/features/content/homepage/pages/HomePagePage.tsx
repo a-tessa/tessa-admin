@@ -4,6 +4,7 @@ import { HeroSectionPage } from '@/features/content/hero/pages/HeroSectionPage'
 import { IndustrySectionEditor } from '@/features/content/industry/components/IndustrySectionEditor'
 import { OperationSectionEditor } from '@/features/content/operations/components/OperationSectionEditor'
 import { ResultsSectionEditor } from '@/features/content/results/components/ResultsSectionEditor'
+import { FooterSectionEditor } from '@/features/content/footer/components/FooterSectionEditor'
 import {
   homePageRoutePath,
   isHomePageSection,
@@ -94,6 +95,12 @@ export function HomePagePage() {
           >
             Resultados
           </TabsTrigger>
+          <TabsTrigger
+            value="rodape"
+            className="min-h-10 flex-none px-1.5 text-sm"
+          >
+            Rodapé
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="secao-principal" className="mt-4 text-sm">
@@ -107,6 +114,9 @@ export function HomePagePage() {
         </TabsContent>
         <TabsContent value="resultados" className="mt-4 text-sm">
           <ResultsSectionEditor />
+        </TabsContent>
+        <TabsContent value="rodape" className="mt-4 text-sm">
+          <FooterSectionEditor />
         </TabsContent>
       </Tabs>
     </div>

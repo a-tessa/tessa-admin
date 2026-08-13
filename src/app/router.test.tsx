@@ -17,6 +17,10 @@ vi.mock('@/features/content/hero/pages/HeroSectionPage', () => ({
   HeroSectionPage: () => <div>Editor existente da Seção Principal</div>,
 }))
 
+vi.mock('@/features/content/footer/components/FooterSectionEditor', () => ({
+  FooterSectionEditor: () => <div>Editor da seção Rodapé</div>,
+}))
+
 vi.mock('@/features/dashboard/pages/DashboardPage', () => ({
   DashboardPage: () => <div>Painel de visão geral</div>,
 }))
@@ -36,20 +40,34 @@ describe('navegação da Página inicial', () => {
         (item) => item.to === '/conteudo/hero',
       ),
     ).toBe(false)
-  })
-
-  it('oferece Imagens dos cabeçalhos dentro de Conteúdos', () => {
-    const contentItem = navigationItems.find(
-      (item) => item.label === 'Conteúdos',
-    )
-
     expect(
       contentItem?.children?.some(
-        (item) =>
-          item.to === '/conteudo/imagens-cabecalhos' &&
-          item.label === 'Imagens dos cabeçalhos',
+        (item) => item.to === '/conteudo/rodape',
       ),
-    ).toBe(true)
+    ).toBe(false)
+  })
+
+  it('redireciona o endereço legado do rodapé para a aba Rodapé', async () => {
+    const router = createRouter({
+      routeTree,
+      history: createMemoryHistory({
+        initialEntries: ['/conteudo/rodape'],
+      }),
+    })
+
+    render(<RouterProvider router={router} />)
+
+    expect(
+      await screen.findByText('Editor da seção Rodapé'),
+    ).toBeInTheDocument()
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe(
+        '/conteudo/pagina-inicial',
+      )
+      expect(router.state.location.search).toEqual({
+        aba: 'rodape',
+      })
+    })
   })
 
   it('redireciona o endereço legado para a aba Seção Principal', async () => {

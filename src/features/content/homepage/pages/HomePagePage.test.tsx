@@ -36,6 +36,13 @@ vi.mock(
   }),
 )
 
+vi.mock(
+  '@/features/content/footer/components/FooterSectionEditor',
+  () => ({
+    FooterSectionEditor: () => <div>Editor da seção Rodapé</div>,
+  }),
+)
+
 function renderPage(initialEntry: string) {
   const rootRoute = createRootRoute()
   const homepageRoute = createRoute({
@@ -65,6 +72,7 @@ describe('editor da Página inicial', () => {
       'Indústria',
       'Operações',
       'Resultados',
+      'Rodapé',
     ])
     expect(screen.getByRole('tab', { name: 'Seção Principal' })).toHaveAttribute(
       'aria-selected',
