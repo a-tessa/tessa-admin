@@ -4,6 +4,7 @@ const homepageSections = [
   'secao-principal',
   'industria',
   'operacoes',
+  'resultados',
 ] as const
 
 export type HomePageSection = (typeof homepageSections)[number]

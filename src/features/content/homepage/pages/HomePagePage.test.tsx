@@ -29,6 +29,13 @@ vi.mock(
   }),
 )
 
+vi.mock(
+  '@/features/content/results/components/ResultsSectionEditor',
+  () => ({
+    ResultsSectionEditor: () => <div>Editor da seção Resultados</div>,
+  }),
+)
+
 function renderPage(initialEntry: string) {
   const rootRoute = createRootRoute()
   const homepageRoute = createRoute({
@@ -57,6 +64,7 @@ describe('editor da Página inicial', () => {
       'Seção Principal',
       'Indústria',
       'Operações',
+      'Resultados',
     ])
     expect(screen.getByRole('tab', { name: 'Seção Principal' })).toHaveAttribute(
       'aria-selected',

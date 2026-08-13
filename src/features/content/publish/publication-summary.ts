@@ -2,6 +2,7 @@ export type HomepagePublicationTab =
   | 'secao-principal'
   | 'industria'
   | 'operacoes'
+  | 'resultados'
 
 export interface PublicationBlocker {
   id: string
@@ -44,6 +45,7 @@ const SECTION_LABELS: ReadonlyArray<readonly [string, string]> = [
   ['industrySection', 'Indústria'],
   ['aboutSection', 'Quem Somos'],
   ['operationSection', 'Operações'],
+  ['resultsSection', 'Resultados'],
   ['headingImages', 'Imagens dos cabeçalhos'],
   ['servicesPages', 'Serviços'],
   ['scenerySection', 'Cenários'],
