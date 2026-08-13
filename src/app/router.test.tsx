@@ -21,6 +21,10 @@ vi.mock('@/features/content/footer/components/FooterSectionEditor', () => ({
   FooterSectionEditor: () => <div>Editor da seção Rodapé</div>,
 }))
 
+vi.mock('@/features/content/company-information', () => ({
+  CompanyInformationPage: () => <div>Editor das informações da empresa</div>,
+}))
+
 vi.mock('@/features/dashboard/pages/DashboardPage', () => ({
   DashboardPage: () => <div>Painel de visão geral</div>,
 }))
@@ -45,6 +49,29 @@ describe('navegação da Página inicial', () => {
         (item) => item.to === '/conteudo/rodape',
       ),
     ).toBe(false)
+    expect(
+      contentItem?.children?.some(
+        (item) => item.to === '/conteudo/informacoes-da-empresa',
+      ),
+    ).toBe(true)
+  })
+
+  it('abre Informações da empresa como página própria', async () => {
+    const router = createRouter({
+      routeTree,
+      history: createMemoryHistory({
+        initialEntries: ['/conteudo/informacoes-da-empresa'],
+      }),
+    })
+
+    render(<RouterProvider router={router} />)
+
+    expect(
+      await screen.findByText('Editor das informações da empresa'),
+    ).toBeInTheDocument()
+    expect(router.state.location.pathname).toBe(
+      '/conteudo/informacoes-da-empresa',
+    )
   })
 
   it('redireciona o endereço legado do rodapé para a aba Rodapé', async () => {

@@ -45,6 +45,29 @@ function formatLocaleList(locales: string[]): string {
   return locales.map((locale) => LOCALE_LABELS[locale] ?? locale).join(', ')
 }
 
+function BlockerLink({ blocker }: { readonly blocker: PublicationBlocker }) {
+  const className =
+    'underline underline-offset-2 hover:text-primary'
+
+  if (blocker.tab === 'informacoes-da-empresa') {
+    return (
+      <Link to="/conteudo/informacoes-da-empresa" className={className}>
+        {blocker.message}
+      </Link>
+    )
+  }
+
+  return (
+    <Link
+      to="/conteudo/pagina-inicial"
+      search={{ aba: blocker.tab }}
+      className={className}
+    >
+      {blocker.message}
+    </Link>
+  )
+}
+
 function BlockerList({ blockers }: { readonly blockers: PublicationBlocker[] }) {
   if (blockers.length === 0) return null
 
@@ -57,13 +80,7 @@ function BlockerList({ blockers }: { readonly blockers: PublicationBlocker[] }) 
       <ul className="space-y-1.5 text-sm text-foreground">
         {blockers.map((blocker) => (
           <li key={blocker.id}>
-            <Link
-              to="/conteudo/pagina-inicial"
-              search={{ aba: blocker.tab }}
-              className="underline underline-offset-2 hover:text-primary"
-            >
-              {blocker.message}
-            </Link>
+            <BlockerLink blocker={blocker} />
           </li>
         ))}
       </ul>

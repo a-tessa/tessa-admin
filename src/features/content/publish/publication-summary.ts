@@ -5,10 +5,14 @@ export type HomepagePublicationTab =
   | 'resultados'
   | 'rodape'
 
+export type PublicationEditorTab =
+  | HomepagePublicationTab
+  | 'informacoes-da-empresa'
+
 export interface PublicationBlocker {
   id: string
   message: string
-  tab: HomepagePublicationTab
+  tab: PublicationEditorTab
 }
 
 interface ChangedSection {

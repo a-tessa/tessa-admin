@@ -59,6 +59,11 @@ export const navigationItems = [
         icon: 'building-2',
       },
       {
+        to: '/conteudo/informacoes-da-empresa',
+        label: 'Informações da empresa',
+        icon: 'building-2',
+      },
+      {
         to: '/conteudo/servicos',
         label: 'Serviços',
         icon: 'briefcase',

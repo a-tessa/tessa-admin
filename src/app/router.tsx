@@ -20,6 +20,7 @@ import {
   validateGallerySearch,
 } from '@/features/content/gallery'
 import { AboutPage } from '@/features/content/about'
+import { CompanyInformationPage } from '@/features/content/company-information'
 import { HeadingImagesPage } from '@/features/content/heading-images'
 import { validateHomePageSearch } from '@/features/content/homepage/homepage-search'
 import { HomePagePage } from '@/features/content/homepage/pages/HomePagePage'
@@ -97,6 +98,12 @@ const contentAboutRoute = createRoute({
   getParentRoute: () => appRoute,
   path: 'conteudo/quem-somos',
   component: AboutPage,
+})
+
+const contentCompanyInformationRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'conteudo/informacoes-da-empresa',
+  component: CompanyInformationPage,
 })
 
 const contentFooterRoute = createRoute({
@@ -236,6 +243,7 @@ export const routeTree = rootRoute.addChildren([
     contentRoute,
     contentHomepageRoute,
     contentAboutRoute,
+    contentCompanyInformationRoute,
     contentFooterRoute,
     contentHeroRoute,
     contentCategoriesRoute,

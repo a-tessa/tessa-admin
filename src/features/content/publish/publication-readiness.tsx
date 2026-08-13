@@ -8,14 +8,14 @@ import {
   type ReactNode,
 } from 'react'
 import type {
-  HomepagePublicationTab,
+  PublicationEditorTab,
   PublicationBlocker,
 } from './publication-summary'
 
 interface PublicationEditorState {
   id: string
   label: string
-  tab: HomepagePublicationTab
+  tab: PublicationEditorTab
   isDirty: boolean
   isInvalid: boolean
   isUploading: boolean
