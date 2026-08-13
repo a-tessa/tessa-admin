@@ -29,6 +29,10 @@ vi.mock('@/features/dashboard/pages/DashboardPage', () => ({
   DashboardPage: () => <div>Painel de visão geral</div>,
 }))
 
+vi.mock('@/features/moderation/contacts/pages/ContactsPage', () => ({
+  ContactsPage: () => <div>Lista de contatos</div>,
+}))
+
 describe('navegação da Página inicial', () => {
   it('oferece Página inicial dentro de Conteúdos sem um item Hero separado', () => {
     const contentItem = navigationItems.find(
@@ -117,6 +121,22 @@ describe('navegação da Página inicial', () => {
       expect(router.state.location.search).toEqual({
         aba: 'secao-principal',
       })
+    })
+  })
+
+  it('redireciona o endereço das notificações de contato para Contatos', async () => {
+    const router = createRouter({
+      routeTree,
+      history: createMemoryHistory({
+        initialEntries: ['/moderacao/notificacoes'],
+      }),
+    })
+
+    render(<RouterProvider router={router} />)
+
+    expect(await screen.findByText('Lista de contatos')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/moderacao/contatos')
     })
   })
 

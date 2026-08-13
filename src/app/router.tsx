@@ -215,6 +215,12 @@ const moderationContactsRoute = createRoute({
   component: ContactsPage,
 })
 
+const moderationContactNotificationsRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'moderacao/notificacoes',
+  component: () => <Navigate to="/moderacao/contatos" replace />,
+})
+
 const moderationTestimonialsRoute = createRoute({
   getParentRoute: () => appRoute,
   path: 'moderacao/depoimentos',
@@ -260,6 +266,7 @@ export const routeTree = rootRoute.addChildren([
     contentBlogEditRoute,
     contentEditRoute,
     moderationContactsRoute,
+    moderationContactNotificationsRoute,
     moderationTestimonialsRoute,
     usersRoute,
     profileRoute,

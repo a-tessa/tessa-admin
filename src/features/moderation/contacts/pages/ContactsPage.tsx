@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
+import { ContactNotificationRecipientsEditor } from '@/features/moderation/contact-notifications'
 import { useContactStats } from '../hooks/use-contact-stats'
 import { useContacts } from '../hooks/use-contacts'
 import { useDeleteContact } from '../hooks/use-delete-contact'
@@ -369,6 +370,8 @@ export function ContactsPage() {
           isLoading={statsQuery.isPending}
         />
       </div>
+
+      <ContactNotificationRecipientsEditor />
 
       <Tabs value={statusFilter} onValueChange={handleStatusChange}>
         <TabsList>
