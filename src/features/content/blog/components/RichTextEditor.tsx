@@ -26,6 +26,10 @@ import {
 } from 'lucide-react'
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
+import {
+  articleLinkMarkAttrs,
+  classifyArticleHref,
+} from '../article-href'
 import { useUploadBodyImage } from '../hooks/use-upload-body-image'
 import { Button } from '@/shared/components/ui/button'
 import {
@@ -39,7 +43,14 @@ import {
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
 import { Separator } from '@/shared/components/ui/separator'
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from '@/shared/components/ui/tabs'
 import { cn } from '@/shared/lib/utils'
+
+type LinkDialogKind = 'internal' | 'external'
 
 interface RichTextEditorProps {
   value: string
@@ -281,6 +292,7 @@ export function RichTextEditor({
   const [linkDialogOpen, setLinkDialogOpen] = useState(false)
   const [linkHref, setLinkHref] = useState('')
   const [linkLabel, setLinkLabel] = useState('')
+  const [linkKind, setLinkKind] = useState<LinkDialogKind>('internal')
   const [isToolbarFloating, setIsToolbarFloating] = useState(false)
 
   const [youtubeDialogOpen, setYoutubeDialogOpen] = useState(false)
@@ -295,8 +307,8 @@ export function RichTextEditor({
           autolink: true,
           defaultProtocol: 'https',
           HTMLAttributes: {
-            rel: 'noopener noreferrer nofollow',
-            target: '_blank',
+            rel: null,
+            target: null,
           },
         },
       }),
@@ -395,6 +407,9 @@ export function RichTextEditor({
 
     setLinkHref(currentHref)
     setLinkLabel(selectedText)
+    setLinkKind(
+      classifyArticleHref(currentHref) === 'internal' ? 'internal' : 'external',
+    )
     setLinkDialogOpen(true)
   }
 
@@ -403,6 +418,7 @@ export function RichTextEditor({
     if (!href) return
 
     const label = linkLabel.trim() || href
+    const attrs = articleLinkMarkAttrs(href)
 
     editor
       .chain()
@@ -411,7 +427,7 @@ export function RichTextEditor({
       .insertContent({
         type: 'text',
         text: label,
-        marks: [{ type: 'link', attrs: { href } }],
+        marks: [{ type: 'link', attrs }],
       })
       .run()
 
@@ -484,11 +500,31 @@ export function RichTextEditor({
           <DialogHeader>
             <DialogTitle>Inserir link</DialogTitle>
             <DialogDescription>
-              Defina o texto exibido e o endereço para onde o link aponta.
+              Use um caminho do site (ex: /contato) ou um endereço externo
+              (ex: https://exemplo.com). O tipo é detectado pelo próprio
+              endereço, então os links já publicados continuam válidos.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-3">
+            <Tabs
+              value={linkKind}
+              onValueChange={(value) => {
+                if (value === 'internal' || value === 'external') {
+                  setLinkKind(value)
+                }
+              }}
+            >
+              <TabsList className="w-full">
+                <TabsTrigger value="internal" className="flex-1">
+                  Página do site
+                </TabsTrigger>
+                <TabsTrigger value="external" className="flex-1">
+                  Site externo
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+
             <div className="space-y-1.5">
               <Label htmlFor="rich-text-link-label">Texto do link</Label>
               <Input
@@ -501,13 +537,20 @@ export function RichTextEditor({
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="rich-text-link-href">Endereço (URL)</Label>
+              <Label htmlFor="rich-text-link-href">
+                {linkKind === 'internal' ? 'Caminho no site' : 'Endereço externo'}
+              </Label>
               <Input
                 id="rich-text-link-href"
-                type="url"
+                type="text"
+                inputMode="url"
                 value={linkHref}
                 onChange={(event) => setLinkHref(event.target.value)}
-                placeholder="https://exemplo.com"
+                placeholder={
+                  linkKind === 'internal'
+                    ? '/contato'
+                    : 'https://exemplo.com'
+                }
                 autoComplete="off"
                 onKeyDown={(event) => {
                   if (event.key === 'Enter') {
@@ -516,6 +559,11 @@ export function RichTextEditor({
                   }
                 }}
               />
+              <p className="text-xs text-muted-foreground">
+                {linkKind === 'internal'
+                  ? 'Comece com / para páginas da Tessa, por exemplo /blog ou /representantes.'
+                  : 'O link abre em uma nova aba. Você pode colar com ou sem https://.'}
+              </p>
             </div>
           </div>
 

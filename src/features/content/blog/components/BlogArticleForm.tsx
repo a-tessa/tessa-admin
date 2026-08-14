@@ -211,7 +211,8 @@ export function BlogArticleForm({
                   </FormControl>
                   <FormDescription>
                     O conteúdo aceita negrito, itálico, títulos (H1, H2 e H3),
-                    listas com marcadores e imagens enviadas pelo editor.
+                    listas, imagens, vídeos do YouTube e links internos ou
+                    externos.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
