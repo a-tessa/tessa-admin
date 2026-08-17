@@ -142,6 +142,35 @@ describe('OperationSectionEditor', () => {
     expect(await screen.findByText('Imagem 1')).toBeInTheDocument()
   })
 
+  it('omite a legenda no save quando o campo opcional é apagado', async () => {
+    const user = userEvent.setup()
+    mockedFetch.mockResolvedValue(section)
+    mockedUpdate.mockImplementation(async (input) => {
+      mockedFetch.mockResolvedValue(input)
+      return { operationSection: input }
+    })
+
+    renderEditor()
+    const firstItem = await screen.findByTestId('operation-item-0')
+    const captionInput = within(firstItem).getByLabelText('Legenda (opcional)')
+    expect(captionInput).toHaveValue('Legenda 0')
+
+    await user.clear(captionInput)
+    expect(captionInput).toHaveValue('')
+
+    await user.click(screen.getByRole('button', { name: 'Salvar rascunho' }))
+
+    await waitFor(() => {
+      expect(mockedUpdate).toHaveBeenCalledWith({
+        images: section.images.map((image, index) =>
+          index === 0 ? { url: image.url, alt: image.alt } : image,
+        ),
+      })
+    })
+
+    expect(captionInput).toHaveValue('')
+  })
+
   it('exibe aviso persistente ao salvar com menos de seis imagens e salva o rascunho', async () => {
     const user = userEvent.setup()
     mockedFetch.mockResolvedValue({
