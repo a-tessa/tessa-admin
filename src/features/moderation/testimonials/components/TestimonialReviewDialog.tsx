@@ -69,7 +69,7 @@ function getInitials(name: string): string {
 function StarRating({ rating }: { rating: number }) {
   return (
     <div
-      className="flex items-center gap-0.5"
+      className="flex shrink-0 items-center gap-0.5 tabular-nums"
       aria-label={`Avaliação ${String(rating)} de 5 estrelas`}
     >
       {Array.from({ length: 5 }).map((_, index) => (
@@ -174,17 +174,19 @@ export function TestimonialReviewDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <div className="flex items-start justify-between gap-3">
-              <div className="space-y-1">
-                <DialogTitle>Moderar depoimento</DialogTitle>
-                <DialogDescription>
+        <DialogContent className="flex max-h-[min(90dvh,40rem)] min-w-0 flex-col overflow-x-hidden overflow-y-auto sm:max-w-2xl">
+          <DialogHeader className="pr-8">
+            <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+              <div className="min-w-0 flex-1 space-y-1">
+                <DialogTitle className="text-balance">
+                  Moderar depoimento
+                </DialogTitle>
+                <DialogDescription className="text-pretty">
                   Revise o conteúdo antes de aprovar ou rejeitar a publicação na
                   landing.
                 </DialogDescription>
               </div>
-              <div className="flex shrink-0 items-center gap-2">
+              <div className="flex max-w-full flex-wrap items-center gap-2">
                 {isGoogle ? (
                   <Badge variant="outline" className="shrink-0">
                     Via Google
@@ -208,8 +210,8 @@ export function TestimonialReviewDialog({
             </div>
           </DialogHeader>
 
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 rounded-lg border bg-muted/30 p-3">
+          <div className="min-w-0 space-y-4">
+            <div className="flex min-w-0 flex-wrap items-center gap-3 rounded-lg border bg-muted/30 p-3">
               <Avatar size="lg">
                 {testimonial.profileImageUrl ? (
                   <AvatarImage
@@ -233,16 +235,16 @@ export function TestimonialReviewDialog({
             </div>
 
             {testimonial.question ? (
-              <div className="rounded-md border-l-2 border-primary/50 bg-primary/5 px-3 py-2 text-sm text-muted-foreground italic">
+              <div className="min-w-0 rounded-md border-l-2 border-primary/50 bg-primary/5 px-3 py-2 text-sm text-pretty text-muted-foreground italic">
                 “{testimonial.question}”
               </div>
             ) : null}
 
-            <div>
-              <p className="mb-1 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <div className="min-w-0">
+              <p className="mb-1 text-xs font-medium tracking-wider text-muted-foreground uppercase">
                 Comentário
               </p>
-              <p className="whitespace-pre-wrap rounded-md border bg-card px-3 py-2.5 text-sm leading-relaxed">
+              <p className="min-w-0 whitespace-pre-wrap break-words rounded-md border bg-card px-3 py-2.5 text-sm leading-relaxed text-pretty">
                 {testimonial.comment}
               </p>
             </div>
@@ -279,7 +281,7 @@ export function TestimonialReviewDialog({
             </dl>
           </div>
 
-          <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
+          <DialogFooter className="flex min-w-0 flex-col-reverse gap-2 sm:flex-row sm:flex-wrap sm:justify-between">
             <Button
               type="button"
               variant="ghost"
@@ -292,7 +294,7 @@ export function TestimonialReviewDialog({
               Remover
             </Button>
 
-            <div className="flex flex-col gap-2 sm:flex-row">
+            <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
               <Button
                 type="button"
                 variant="outline"
