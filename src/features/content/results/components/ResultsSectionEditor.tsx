@@ -1,12 +1,23 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useBlocker } from '@tanstack/react-router'
-import { AlertCircle, Loader2, RotateCcw, Save, Trash2 } from 'lucide-react'
+import {
+  AlertCircle,
+  Loader2,
+  Plus,
+  RotateCcw,
+  Save,
+  Trash2,
+} from 'lucide-react'
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   defaultResultsSectionFormValues,
-  RESULTS_STAT_FIELDS,
+  emptyResultsStatFormValue,
+  formatResultStatDisplay,
+  MAX_RESULTS_LABEL_LENGTH,
+  MAX_RESULTS_STATS,
+  MIN_RESULTS_STATS,
   resultsSectionFormSchema,
   toResultsSectionFormValues,
   toResultsSectionInput,
@@ -54,6 +65,20 @@ import {
 import { Input } from '@/shared/components/ui/input'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 
+function CharacterCounter({
+  current,
+  maximum,
+}: {
+  readonly current: number
+  readonly maximum: number
+}) {
+  return (
+    <span className="font-mono text-xs tabular-nums text-muted-foreground">
+      {String(current)} / {String(maximum)}
+    </span>
+  )
+}
+
 function ResultsEditorSkeleton() {
   return (
     <Card>
@@ -63,9 +88,13 @@ function ResultsEditorSkeleton() {
       </CardHeader>
       <CardContent className="space-y-5">
         {Array.from({ length: 3 }).map((_, index) => (
-          <div key={index} className="space-y-2">
-            <Skeleton className="h-4 w-56" />
-            <Skeleton className="h-10 w-full max-w-xs" />
+          <div key={index} className="space-y-3 rounded-xl border p-4">
+            <Skeleton className="h-4 w-24" />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <Skeleton className="h-10 w-full" />
           </div>
         ))}
       </CardContent>
@@ -83,7 +112,17 @@ export function ResultsSectionEditor() {
     defaultValues: defaultResultsSectionFormValues,
     mode: 'onBlur',
   })
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: 'stats',
+  })
+  const stats = useWatch({
+    control: form.control,
+    name: 'stats',
+  })
   const isDirty: boolean = form.formState.isDirty
+  const canAddStat: boolean = fields.length < MAX_RESULTS_STATS
+  const canRemoveStat: boolean = fields.length > MIN_RESULTS_STATS
 
   useBlocker({
     shouldBlockFn: (): boolean =>
@@ -174,8 +213,11 @@ export function ResultsSectionEditor() {
       <CardHeader>
         <CardTitle>Números da seção Resultados</CardTitle>
         <CardDescription>
-          Altere apenas os três valores exibidos na faixa de resultados. Título,
-          prefixos e labels continuam fixos na landing.
+          Edite o valor completo e o texto de cada número. Dá para ter de{' '}
+          {String(MIN_RESULTS_STATS)} a {String(MAX_RESULTS_STATS)} números. A
+          partir de 1.000 o valor vira K; a partir de 1.000.000 vira MI. O
+          prefixo + permanece fixo. Os textos são escritos em português e
+          localizados automaticamente na publicação.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -205,32 +247,127 @@ export function ResultsSectionEditor() {
               </Alert>
             ) : null}
 
-            {RESULTS_STAT_FIELDS.map(({ name, label }) => (
-              <FormField
-                key={name}
-                control={form.control}
-                name={name}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{label}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        inputMode="numeric"
-                        min={0}
-                        step={1}
-                        className="max-w-xs"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Número inteiro animado na landing (prefixo e sufixo fixos).
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            ))}
+            <div className="space-y-4">
+              {fields.map((statField, index) => {
+                const currentStat = stats[index]
+                const labelLength: number = currentStat
+                  ? currentStat.label.trim().length
+                  : 0
+
+                return (
+                  <div
+                    key={statField.id}
+                    className="space-y-4 rounded-xl border border-border p-4"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <h3 className="text-sm font-medium">
+                        Número {String(index + 1)}
+                      </h3>
+                      {canRemoveStat ? (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          aria-label={`Remover número ${String(index + 1)}`}
+                          disabled={isSaving || isDeleting}
+                          onClick={(): void => {
+                            remove(index)
+                          }}
+                        >
+                          <Trash2 aria-hidden="true" />
+                        </Button>
+                      ) : null}
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name={
+                        `stats.${String(index)}.value` as `stats.${number}.value`
+                      }
+                      render={({ field }) => {
+                        const parsedValue = /^\d+$/.test(field.value)
+                          ? Number(field.value)
+                          : null
+
+                        return (
+                          <FormItem>
+                            <FormLabel>Valor</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                inputMode="numeric"
+                                autoComplete="off"
+                                className="max-w-xs tabular-nums"
+                                placeholder="8000000"
+                                name={field.name}
+                                ref={field.ref}
+                                value={field.value}
+                                onBlur={field.onBlur}
+                                onChange={(event): void => {
+                                  field.onChange(
+                                    event.target.value.replace(/\D/g, ''),
+                                  )
+                                }}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              {parsedValue === null
+                                ? 'Digite o número completo, por exemplo 8000000.'
+                                : `Exibido como ${formatResultStatDisplay(parsedValue)}`}
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )
+                      }}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name={
+                        `stats.${String(index)}.label` as `stats.${number}.label`
+                      }
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center justify-between gap-3">
+                            <FormLabel>Texto</FormLabel>
+                            <CharacterCounter
+                              current={labelLength}
+                              maximum={MAX_RESULTS_LABEL_LENGTH}
+                            />
+                          </div>
+                          <FormControl>
+                            <Input
+                              maxLength={MAX_RESULTS_LABEL_LENGTH}
+                              placeholder="de m² em estruturas metálicas"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )
+              })}
+            </div>
+
+            {form.formState.errors.stats?.root?.message ? (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.stats.root.message}
+              </p>
+            ) : null}
+
+            <Button
+              type="button"
+              variant="outline"
+              disabled={!canAddStat || isSaving || isDeleting}
+              onClick={(): void => {
+                append(emptyResultsStatFormValue)
+              }}
+            >
+              <Plus aria-hidden="true" />
+              Adicionar número
+            </Button>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <Button type="submit" disabled={isSaving || isDeleting}>

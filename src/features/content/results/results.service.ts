@@ -1,9 +1,13 @@
 import { ApiError, authenticatedRequest } from '@/shared/lib/api'
-import type { ResultsSection, ResultsSectionResponse } from './types'
+import type {
+  ResultsSection,
+  ResultsSectionResponse,
+  StoredResultsSection,
+} from './types'
 
 const BASE_PATH = '/api/content/admin/results-section'
 
-export async function fetchResultsSection(): Promise<ResultsSection | null> {
+export async function fetchResultsSection(): Promise<StoredResultsSection | null> {
   try {
     const response: ResultsSectionResponse =
       await authenticatedRequest<ResultsSectionResponse>(BASE_PATH)
