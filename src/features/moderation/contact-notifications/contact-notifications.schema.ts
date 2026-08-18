@@ -2,6 +2,7 @@ import { z } from 'zod'
 import type {
   ContactNotificationRecipientsResponse,
   ReplaceContactNotificationRecipientsInput,
+  SuggestedContactNotificationUser,
 } from './types'
 
 export const MAX_CONTACT_NOTIFICATION_RECIPIENTS = 10
@@ -80,6 +81,21 @@ export function toContactNotificationRecipientsFormValues(
       name: recipient.name ?? '',
     })),
   }
+}
+
+export function availableSuggestedUsers(
+  suggestedUsers: SuggestedContactNotificationUser[],
+  recipients: { email: string }[],
+): SuggestedContactNotificationUser[] {
+  const takenEmails = new Set(
+    recipients
+      .map((recipient) => recipient.email.trim().toLowerCase())
+      .filter((email) => email.length > 0),
+  )
+
+  return suggestedUsers.filter(
+    (user) => !takenEmails.has(user.email.toLowerCase()),
+  )
 }
 
 export function toContactNotificationRecipientsInput(

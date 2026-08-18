@@ -40,6 +40,7 @@ function makeResponse(
     recipients: [
       { id: 'recipient-1', email: 'comercial@tessa.com.br', name: 'Comercial' },
     ],
+    suggestedUsers: [],
     fallbackEmail: 'contato.tessa.estruturas@gmail.com',
     isEmailDeliveryConfigured: true,
     ...overrides,
@@ -192,5 +193,94 @@ describe('seção dos destinatários das notificações de contato', () => {
       await screen.findByText('Este e-mail já está na lista.'),
     ).toBeInTheDocument()
     expect(mockedReplace).not.toHaveBeenCalled()
+  })
+
+  it('oferece os usuários cadastrados como sugestão de destinatário', async () => {
+    const user = userEvent.setup()
+    mockedFetch.mockResolvedValue(
+      makeResponse({
+        recipients: [],
+        suggestedUsers: [
+          { id: 'user-1', name: 'Ana Souza', email: 'ana@tessa.com.br' },
+        ],
+      }),
+    )
+    renderEditor()
+
+    await expandSection(user)
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Adicionar Ana Souza (ana@tessa.com.br)',
+      }),
+    )
+
+    expect(getEmailInput(0)).toHaveValue('ana@tessa.com.br')
+    expect(screen.getByLabelText('Identificação (opcional)')).toHaveValue(
+      'Ana Souza',
+    )
+    expect(
+      screen.queryByRole('button', {
+        name: 'Adicionar Ana Souza (ana@tessa.com.br)',
+      }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('preenche uma linha vazia ao aceitar a sugestão de um usuário', async () => {
+    const user = userEvent.setup()
+    mockedFetch.mockResolvedValue(
+      makeResponse({
+        recipients: [],
+        suggestedUsers: [
+          { id: 'user-1', name: 'Ana Souza', email: 'ana@tessa.com.br' },
+        ],
+      }),
+    )
+    renderEditor()
+
+    await expandSection(user)
+    await user.click(
+      screen.getByRole('button', { name: 'Adicionar destinatário' }),
+    )
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Adicionar Ana Souza (ana@tessa.com.br)',
+      }),
+    )
+
+    expect(screen.getAllByLabelText('E-mail')).toHaveLength(1)
+    expect(getEmailInput(0)).toHaveValue('ana@tessa.com.br')
+  })
+
+  it('esconde a sugestão de um usuário já presente na lista', async () => {
+    const user = userEvent.setup()
+    mockedFetch.mockResolvedValue(
+      makeResponse({
+        recipients: [
+          { id: 'recipient-1', email: 'ana@tessa.com.br', name: 'Ana' },
+        ],
+        suggestedUsers: [
+          { id: 'user-1', name: 'Ana Souza', email: 'ana@tessa.com.br' },
+          {
+            id: 'user-2',
+            name: 'Carlos Lima',
+            email: 'carlos@tessa.com.br',
+          },
+        ],
+      }),
+    )
+    renderEditor()
+
+    await expandSection(user)
+
+    expect(
+      screen.queryByRole('button', {
+        name: 'Adicionar Ana Souza (ana@tessa.com.br)',
+      }),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('button', {
+        name: 'Adicionar Carlos Lima (carlos@tessa.com.br)',
+      }),
+    ).toBeInTheDocument()
   })
 })

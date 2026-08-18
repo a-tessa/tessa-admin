@@ -10,11 +10,13 @@ import {
   RotateCcw,
   Save,
   Trash2,
+  UserPlus,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
+  availableSuggestedUsers,
   contactNotificationRecipientsFormSchema,
   defaultContactNotificationRecipientsFormValues,
   MAX_CONTACT_NOTIFICATION_RECIPIENTS,
@@ -28,7 +30,10 @@ import {
   useContactNotificationRecipients,
   useSaveContactNotificationRecipients,
 } from '../hooks/use-contact-notification-recipients'
-import type { ContactNotificationRecipientsResponse } from '../types'
+import type {
+  ContactNotificationRecipientsResponse,
+  SuggestedContactNotificationUser,
+} from '../types'
 import {
   Alert,
   AlertDescription,
@@ -86,6 +91,11 @@ export function ContactNotificationRecipientsEditor() {
     control: form.control,
     name: 'recipients',
   })
+  const watchedRecipients = useWatch({
+    control: form.control,
+    name: 'recipients',
+    defaultValue: defaultContactNotificationRecipientsFormValues.recipients,
+  })
 
   useBlocker({
     shouldBlockFn: (): boolean =>
@@ -108,6 +118,46 @@ export function ContactNotificationRecipientsEditor() {
   const isSaving: boolean = saveMutation.isPending
   const canAddRecipient: boolean =
     fields.length < MAX_CONTACT_NOTIFICATION_RECIPIENTS
+  const suggestedUsers: SuggestedContactNotificationUser[] =
+    availableSuggestedUsers(
+      recipientsQuery.data?.suggestedUsers ?? [],
+      watchedRecipients,
+    )
+  const hasEmptyRecipientRow: boolean = watchedRecipients.some(
+    (recipient) => recipient.email.trim().length === 0,
+  )
+  const canAcceptSuggestion: boolean = canAddRecipient || hasEmptyRecipientRow
+
+  function handleAddSuggestedUser(user: SuggestedContactNotificationUser): void {
+    const recipients = form.getValues('recipients')
+    const emptyIndex = recipients.findIndex(
+      (recipient) => recipient.email.trim().length === 0,
+    )
+
+    if (emptyIndex >= 0) {
+      form.setValue(
+        `recipients.${String(emptyIndex)}.email` as `recipients.${number}.email`,
+        user.email,
+        {
+          shouldDirty: true,
+          shouldValidate: true,
+        },
+      )
+      form.setValue(
+        `recipients.${String(emptyIndex)}.name` as `recipients.${number}.name`,
+        user.name,
+        {
+          shouldDirty: true,
+          shouldValidate: true,
+        },
+      )
+      return
+    }
+
+    if (recipients.length >= MAX_CONTACT_NOTIFICATION_RECIPIENTS) return
+
+    append({ email: user.email, name: user.name })
+  }
 
   function handleSubmit(values: ContactNotificationRecipientsFormValues): void {
     saveMutation.mutate(toContactNotificationRecipientsInput(values), {
@@ -208,9 +258,7 @@ export function ContactNotificationRecipientsEditor() {
                       <Info aria-hidden="true" />
                       <AlertTitle>Nenhum destinatário cadastrado</AlertTitle>
                       <AlertDescription>
-                        Com a lista vazia, as notificações continuam indo para{' '}
-                        <strong>{recipientsQuery.data.fallbackEmail}</strong>, o
-                        endereço padrão do ambiente.
+                        Com a lista vazia, as notificações continuam indo para{' '}<strong>{recipientsQuery.data.fallbackEmail}</strong>, o endereço padrão do ambiente.
                       </AlertDescription>
                     </Alert>
                   ) : null}
@@ -309,6 +357,40 @@ export function ContactNotificationRecipientsEditor() {
                       <p className="text-sm text-destructive">
                         {form.formState.errors.recipients.root.message}
                       </p>
+                    ) : null}
+
+                    {suggestedUsers.length > 0 ? (
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">
+                          Usuários cadastrados
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Clique para adicionar o e-mail de um usuário já
+                          criado.
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {suggestedUsers.map((user) => (
+                            <Button
+                              key={user.id}
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="max-w-full"
+                              disabled={!canAcceptSuggestion || isSaving}
+                              aria-label={`Adicionar ${user.name} (${user.email})`}
+                              onClick={(): void => {
+                                handleAddSuggestedUser(user)
+                              }}
+                            >
+                              <UserPlus aria-hidden="true" />
+                              <span className="truncate">{user.name}</span>
+                              <span className="truncate text-muted-foreground">
+                                {user.email}
+                              </span>
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
                     ) : null}
 
                     <Button
