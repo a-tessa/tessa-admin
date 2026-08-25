@@ -25,6 +25,14 @@ vi.mock('@/features/content/company-information', () => ({
   CompanyInformationPage: () => <div>Editor das informações da empresa</div>,
 }))
 
+vi.mock('@/features/content/seo', () => ({
+  SeoSettingsPage: () => <div>Editor de SEO</div>,
+}))
+
+vi.mock('@/features/content/redirects', () => ({
+  RedirectsPage: () => <div>Editor de redirecionamentos</div>,
+}))
+
 vi.mock('@/features/dashboard/pages/DashboardPage', () => ({
   DashboardPage: () => <div>Painel de visão geral</div>,
 }))
@@ -58,6 +66,44 @@ describe('navegação da Página inicial', () => {
         (item) => item.to === '/conteudo/informacoes-da-empresa',
       ),
     ).toBe(true)
+    expect(
+      contentItem?.children?.some((item) => item.to === '/conteudo/seo'),
+    ).toBe(true)
+    expect(
+      contentItem?.children?.some(
+        (item) => item.to === '/conteudo/redirecionamentos',
+      ),
+    ).toBe(true)
+  })
+
+  it('abre SEO como página própria', async () => {
+    const router = createRouter({
+      routeTree,
+      history: createMemoryHistory({
+        initialEntries: ['/conteudo/seo'],
+      }),
+    })
+
+    render(<RouterProvider router={router} />)
+
+    expect(await screen.findByText('Editor de SEO')).toBeInTheDocument()
+    expect(router.state.location.pathname).toBe('/conteudo/seo')
+  })
+
+  it('abre Redirecionamentos como página própria', async () => {
+    const router = createRouter({
+      routeTree,
+      history: createMemoryHistory({
+        initialEntries: ['/conteudo/redirecionamentos'],
+      }),
+    })
+
+    render(<RouterProvider router={router} />)
+
+    expect(
+      await screen.findByText('Editor de redirecionamentos'),
+    ).toBeInTheDocument()
+    expect(router.state.location.pathname).toBe('/conteudo/redirecionamentos')
   })
 
   it('abre Informações da empresa como página própria', async () => {

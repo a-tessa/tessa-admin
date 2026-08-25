@@ -14,6 +14,8 @@ export type NavigationIcon =
   | 'file-down'
   | 'inbox'
   | 'instagram'
+  | 'search'
+  | 'arrow-right-left'
 
 export interface NavigationChild {
   readonly to: string
@@ -62,6 +64,16 @@ export const navigationItems = [
         to: '/conteudo/informacoes-da-empresa',
         label: 'Informações da empresa',
         icon: 'building-2',
+      },
+      {
+        to: '/conteudo/seo',
+        label: 'SEO',
+        icon: 'search',
+      },
+      {
+        to: '/conteudo/redirecionamentos',
+        label: 'Redirecionamentos',
+        icon: 'arrow-right-left',
       },
       {
         to: '/conteudo/servicos',

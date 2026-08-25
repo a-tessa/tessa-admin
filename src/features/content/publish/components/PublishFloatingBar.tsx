@@ -57,6 +57,14 @@ function BlockerLink({ blocker }: { readonly blocker: PublicationBlocker }) {
     )
   }
 
+  if (blocker.tab === 'seo') {
+    return (
+      <Link to="/conteudo/seo" className={className}>
+        {blocker.message}
+      </Link>
+    )
+  }
+
   return (
     <Link
       to="/conteudo/pagina-inicial"

@@ -15,6 +15,8 @@ import {
   Menu,
   MessageSquareQuote,
   Newspaper,
+  Search,
+  ArrowRightLeft,
   ShieldCheck,
   Tags,
   Users,
@@ -55,6 +57,8 @@ const iconMap: Record<NavigationIcon, typeof LayoutDashboard> = {
   'file-down': FileDown,
   'inbox': Inbox,
   'instagram': Camera,
+  search: Search,
+  'arrow-right-left': ArrowRightLeft,
   users: Users,
 }
 
@@ -212,6 +216,8 @@ function PageTitle() {
   if (path === '/conteudo/pagina-inicial') return 'Página inicial'
   if (path === '/conteudo/quem-somos') return 'Quem Somos'
   if (path === '/conteudo/informacoes-da-empresa') return 'Informações da empresa'
+  if (path === '/conteudo/seo') return 'SEO'
+  if (path === '/conteudo/redirecionamentos') return 'Redirecionamentos'
   if (path === '/conteudo/categorias') return 'Categorias'
   if (path.startsWith('/conteudo/servicos')) return 'Serviços'
   if (path === '/conteudo/cenarios') return 'Cenários'

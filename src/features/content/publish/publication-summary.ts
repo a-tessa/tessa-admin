@@ -8,6 +8,7 @@ export type HomepagePublicationTab =
 export type PublicationEditorTab =
   | HomepagePublicationTab
   | 'informacoes-da-empresa'
+  | 'seo'
 
 export interface PublicationBlocker {
   id: string
@@ -61,6 +62,8 @@ const SECTION_LABELS: ReadonlyArray<readonly [string, string]> = [
   ['nps', 'Depoimentos'],
   ['instagramSelection', 'Instagram'],
   ['companyInformation', 'Informações da empresa'],
+  ['seoDefaults', 'Padrões globais de SEO'],
+  ['pageSeo', 'SEO da página'],
 ]
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {

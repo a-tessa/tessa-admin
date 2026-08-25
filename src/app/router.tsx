@@ -22,6 +22,8 @@ import {
 import { AboutPage } from '@/features/content/about'
 import { CompanyInformationPage } from '@/features/content/company-information'
 import { HeadingImagesPage } from '@/features/content/heading-images'
+import { SeoSettingsPage } from '@/features/content/seo'
+import { RedirectsPage } from '@/features/content/redirects'
 import { validateHomePageSearch } from '@/features/content/homepage/homepage-search'
 import { HomePagePage } from '@/features/content/homepage/pages/HomePagePage'
 import { InstagramPage } from '@/features/content/instagram/pages/InstagramPage'
@@ -104,6 +106,18 @@ const contentCompanyInformationRoute = createRoute({
   getParentRoute: () => appRoute,
   path: 'conteudo/informacoes-da-empresa',
   component: CompanyInformationPage,
+})
+
+const contentSeoRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'conteudo/seo',
+  component: SeoSettingsPage,
+})
+
+const contentRedirectsRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'conteudo/redirecionamentos',
+  component: RedirectsPage,
 })
 
 const contentFooterRoute = createRoute({
@@ -250,6 +264,8 @@ export const routeTree = rootRoute.addChildren([
     contentHomepageRoute,
     contentAboutRoute,
     contentCompanyInformationRoute,
+    contentSeoRoute,
+    contentRedirectsRoute,
     contentFooterRoute,
     contentHeroRoute,
     contentCategoriesRoute,
