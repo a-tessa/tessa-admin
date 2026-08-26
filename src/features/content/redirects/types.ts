@@ -10,6 +10,8 @@ export interface RedirectRecord {
   entityId: string | null
   createdAt: string
   updatedAt: string
+  destinationMissing: boolean
+  sourceOccupied: boolean
 }
 
 export interface RedirectPagination {

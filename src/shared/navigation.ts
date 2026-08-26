@@ -66,16 +66,6 @@ export const navigationItems = [
         icon: 'building-2',
       },
       {
-        to: '/conteudo/seo',
-        label: 'SEO',
-        icon: 'search',
-      },
-      {
-        to: '/conteudo/redirecionamentos',
-        label: 'Redirecionamentos',
-        icon: 'arrow-right-left',
-      },
-      {
         to: '/conteudo/servicos',
         label: 'Serviços',
         icon: 'briefcase',
@@ -123,6 +113,24 @@ export const navigationItems = [
     ],
   },
   {
+    to: '/conteudo/seo',
+    label: 'SEO e URLs',
+    summary: 'Padrões de busca, SEO das páginas e mapa de redirecionamentos.',
+    icon: 'search',
+    children: [
+      {
+        to: '/conteudo/seo',
+        label: 'SEO',
+        icon: 'search',
+      },
+      {
+        to: '/conteudo/redirecionamentos',
+        label: 'Redirecionamentos',
+        icon: 'arrow-right-left',
+      },
+    ],
+  },
+  {
     to: '/moderacao',
     label: 'Moderação',
     summary: 'Aprovar envios dos visitantes da landing.',
@@ -147,3 +155,17 @@ export const navigationItems = [
     icon: 'users',
   },
 ] satisfies NavigationItem[]
+
+export function isNavigationGroupActive(
+  item: NavigationItem,
+  currentPath: string,
+): boolean {
+  if (currentPath === item.to) return true
+  if (item.children && item.children.length > 0) {
+    return item.children.some(
+      (child) =>
+        currentPath === child.to || currentPath.startsWith(`${child.to}/`),
+    )
+  }
+  return currentPath.startsWith(`${item.to}/`)
+}

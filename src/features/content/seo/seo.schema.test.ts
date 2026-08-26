@@ -139,6 +139,12 @@ describe('seo.schema', () => {
       canonicalUrl: 'https://origem.example/artigo',
       convertedFromOwnHost: false,
     })
+    expect(
+      normalizeCanonicalInput('http://tessa.com.br/quem-somos', siteOrigin),
+    ).toEqual({
+      canonicalUrl: '/quem-somos',
+      convertedFromOwnHost: true,
+    })
 
     const formValues = toPageSeoFormValues({
       home: {

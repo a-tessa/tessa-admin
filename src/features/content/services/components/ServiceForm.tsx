@@ -231,7 +231,7 @@ export function ServiceForm({
   onCancel,
   resetKey,
 }: ServiceFormProps) {
-  const slugManuallyEditedRef = useRef(false)
+  const slugManuallyEditedRef = useRef(Boolean(service?.slug))
   const bgFileInputRef = useRef<HTMLInputElement>(null)
   const galleryFileInputRef = useRef<HTMLInputElement>(null)
   const categoriesQuery = useCategories()
@@ -280,7 +280,7 @@ export function ServiceForm({
 
   useEffect(() => {
     cleanupPreviews()
-    slugManuallyEditedRef.current = false
+    slugManuallyEditedRef.current = Boolean(service?.slug)
     galleryFilesRef.current = new Map()
     pendingFilesRef.current = []
     setGalleryPreviews(new Map())
@@ -532,7 +532,9 @@ export function ServiceForm({
                   />
                 </FormControl>
                 <FormDescription>
-                  Gerado do título automaticamente.
+                  {service
+                    ? 'O endereço da página só muda se você editar o slug. Mudar o slug gera um redirecionamento permanente.'
+                    : 'Gerado do título automaticamente enquanto você digita. Edite o slug para um endereço diferente.'}
                 </FormDescription>
                 <FormMessage />
               </FormItem>

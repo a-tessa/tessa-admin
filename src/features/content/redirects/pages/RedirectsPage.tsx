@@ -49,9 +49,6 @@ import {
   TableRow,
 } from '@/shared/components/ui/table'
 import { formatDateTime } from '@/shared/lib/format'
-import { useAdminBlogArticles } from '@/features/content/blog/hooks/use-admin-blog-articles'
-import { useServices } from '@/features/content/services/hooks/use-services'
-import { isSlugChangeDestinationMissing } from '../destination-status'
 import {
   useCreateRedirect,
   useDeleteRedirect,
@@ -87,23 +84,9 @@ export function RedirectsPage() {
     [page, query],
   )
   const listQuery = useRedirects(listParams)
-  const blogQuery = useAdminBlogArticles({ page: 1, perPage: 200 })
-  const servicesQuery = useServices()
   const createMutation = useCreateRedirect()
   const updateMutation = useUpdateRedirect()
   const deleteMutation = useDeleteRedirect()
-
-  const liveDestinations = useMemo(
-    () => ({
-      blogSlugs: new Set(
-        (blogQuery.data?.articles ?? []).map((article) => article.slug),
-      ),
-      serviceSlugs: new Set(
-        (servicesQuery.data?.servicesPages ?? []).map((page) => page.slug),
-      ),
-    }),
-    [blogQuery.data?.articles, servicesQuery.data?.servicesPages],
-  )
 
   const form = useForm<RedirectFormValues>({
     resolver: zodResolver(redirectFormSchema),
@@ -143,7 +126,7 @@ export function RedirectsPage() {
         { id: editing.id, input },
         {
           onSuccess: (): void => {
-            toast.success('Redirecionamento atualizado. Vale imediatamente, sem publicar.')
+            toast.success('Redirecionamento atualizado. Vale em até 60 segundos, sem publicar.')
             setEditorOpen(false)
           },
           onError: (error: Error): void => {
@@ -156,7 +139,7 @@ export function RedirectsPage() {
 
     createMutation.mutate(input, {
       onSuccess: (): void => {
-        toast.success('Redirecionamento criado. Vale imediatamente, sem publicar.')
+        toast.success('Redirecionamento criado. Vale em até 60 segundos, sem publicar.')
         setEditorOpen(false)
       },
       onError: (error: Error): void => {
@@ -172,9 +155,11 @@ export function RedirectsPage() {
           Redirecionamentos
         </h2>
         <p className="mt-1 text-pretty text-sm text-muted-foreground">
-          Caminhos antigos passam a responder 301 assim que você salva. Esta
-          tela não entra na barra de publicar — use-a também para URLs herdadas
-          do site anterior.
+          Artigos do blog e páginas de serviço do CMS geram um redirecionamento
+          permanente automaticamente quando o slug muda. Qualquer outro caminho
+          — inclusive URLs do site anterior — cadastre aqui; vale nos três
+          idiomas em até 60 segundos, sem publicar. Origens que ainda são
+          páginas vivas não disparam.
         </p>
       </div>
 
@@ -247,14 +232,15 @@ export function RedirectsPage() {
                     <TableCell className="font-mono">{record.fromPath}</TableCell>
                     <TableCell>
                       <span className="font-mono">{record.toPath}</span>
-                      {blogQuery.isSuccess &&
-                      servicesQuery.isSuccess &&
-                      isSlugChangeDestinationMissing(
-                        record,
-                        liveDestinations,
-                      ) ? (
+                      {record.destinationMissing ? (
                         <span className="mt-1 block text-xs text-destructive">
                           Destino responde 404 — o conteúdo foi excluído.
+                        </span>
+                      ) : null}
+                      {record.sourceOccupied ? (
+                        <span className="mt-1 block text-xs text-muted-foreground">
+                          Origem ainda é uma página viva — o redirecionamento
+                          não dispara.
                         </span>
                       ) : null}
                     </TableCell>
@@ -336,7 +322,7 @@ export function RedirectsPage() {
             <DialogDescription>
               {editing
                 ? 'Ao editar um redirecionamento automático, ele vira manual e deixa de ser sobrescrito por mudança de slug.'
-                : 'Vale assim que salvar, sem passar pela publicação do conteúdo.'}
+                : 'Vale em até 60 segundos, sem passar pela publicação do conteúdo.'}
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
@@ -385,7 +371,7 @@ export function RedirectsPage() {
                 name="statusCode"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Código HTTP</FormLabel>
+                    <FormLabel>Tipo</FormLabel>
                     <FormControl>
                       <select
                         className="h-10 w-full rounded-lg border border-input bg-input/20 px-2 text-sm"
@@ -395,8 +381,8 @@ export function RedirectsPage() {
                         }}
                         onBlur={field.onBlur}
                       >
-                        <option value="301">301 permanente</option>
-                        <option value="302">302 temporário</option>
+                        <option value="301">Permanente</option>
+                        <option value="302">Temporário</option>
                       </select>
                     </FormControl>
                     <FormMessage />

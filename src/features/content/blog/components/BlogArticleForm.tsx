@@ -94,6 +94,14 @@ const blogArticleFormSchema = z.object({
     .trim()
     .min(2, 'O título precisa ter ao menos 2 caracteres.')
     .max(200, 'O título pode ter no máximo 200 caracteres.'),
+  slug: z
+    .string()
+    .trim()
+    .max(200, 'O slug pode ter no máximo 200 caracteres.')
+    .regex(
+      /^$|^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+      'Use apenas letras minúsculas, números e hífens.',
+    ),
   categorySlug: z.string().trim().min(1, 'Selecione uma categoria.'),
   content: z.string(),
   headerImageAlt: z
@@ -130,6 +138,7 @@ export function BlogArticleForm({
 
   const defaultValues: BlogArticleFormValues = {
     title: article?.title ?? '',
+    slug: article?.slug ?? '',
     categorySlug: article?.categorySlug ?? '',
     content: article?.content ?? '',
     headerImageAlt: article?.headerImageAlt ?? '',
@@ -154,6 +163,7 @@ export function BlogArticleForm({
 
     onSubmit({
       title: values.title.trim(),
+      ...(isEditing ? { slug: values.slug.trim() } : {}),
       categorySlug: values.categorySlug,
       content: sanitized,
       headerImageAlt: values.headerImageAlt,
@@ -186,13 +196,38 @@ export function BlogArticleForm({
                     />
                   </FormControl>
                   <FormDescription>
-                    O slug do artigo será gerado automaticamente a partir do
-                    título.
+                    {isEditing
+                      ? 'O endereço do artigo só muda se você editar o slug abaixo.'
+                      : 'O slug do artigo é gerado automaticamente a partir do título.'}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            {isEditing ? (
+              <FormField
+                control={form.control}
+                name="slug"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Slug (URL)</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="como-escolher-estruturas-metalicas"
+                        autoComplete="off"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Mudar o slug gera um redirecionamento permanente da URL
+                      antiga.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ) : null}
 
             <FormField
               control={form.control}

@@ -42,6 +42,9 @@ export async function fetchBlogArticleBySlug(
 function buildArticleFormData(input: BlogArticleFormInput): FormData {
   const formData = new FormData()
   formData.append('title', input.title)
+  if (input.slug) {
+    formData.append('slug', input.slug)
+  }
   formData.append('content', input.content)
   formData.append('categorySlug', input.categorySlug)
   formData.append('status', input.status)

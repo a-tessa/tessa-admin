@@ -38,7 +38,7 @@ import {
   SheetTrigger,
 } from '@/shared/components/ui/sheet'
 import type { NavigationIcon, NavigationItem } from '@/shared/navigation'
-import { navigationItems } from '@/shared/navigation'
+import { isNavigationGroupActive, navigationItems } from '@/shared/navigation'
 import { cn } from '@/shared/lib/utils'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/shared/components/ui/collapsible'
 
@@ -112,7 +112,7 @@ function NavGroup({
   currentPath: string
   onNavigate?: (() => void) | undefined
 }) {
-  const isActive = currentPath.startsWith(item.to)
+  const isActive = isNavigationGroupActive(item, currentPath)
   const Icon = iconMap[item.icon]
 
   return (

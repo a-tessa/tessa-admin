@@ -51,6 +51,7 @@ export interface BlogBodyImageUploadResponse {
 
 export interface BlogArticleFormInput {
   title: string
+  slug?: string
   content: string
   categorySlug: string
   headerImageAlt: string

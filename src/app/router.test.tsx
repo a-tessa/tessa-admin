@@ -68,12 +68,25 @@ describe('navegação da Página inicial', () => {
     ).toBe(true)
     expect(
       contentItem?.children?.some((item) => item.to === '/conteudo/seo'),
-    ).toBe(true)
+    ).toBe(false)
     expect(
       contentItem?.children?.some(
         (item) => item.to === '/conteudo/redirecionamentos',
       ),
-    ).toBe(true)
+    ).toBe(false)
+  })
+
+  it('agrupa SEO e redirecionamentos fora de Conteúdos', () => {
+    const seoItem = navigationItems.find((item) => item.label === 'SEO e URLs')
+
+    expect(seoItem?.children).toEqual([
+      { to: '/conteudo/seo', label: 'SEO', icon: 'search' },
+      {
+        to: '/conteudo/redirecionamentos',
+        label: 'Redirecionamentos',
+        icon: 'arrow-right-left',
+      },
+    ])
   })
 
   it('abre SEO como página própria', async () => {

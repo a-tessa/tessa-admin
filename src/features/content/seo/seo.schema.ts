@@ -82,8 +82,10 @@ export function normalizeCanonicalInput(
   if (/^https?:\/\//i.test(trimmed)) {
     try {
       const url = new URL(trimmed)
-      const origin = new URL(siteOrigin).origin
-      if (url.origin === origin) {
+      const origin = new URL(siteOrigin)
+      if (
+        url.hostname.toLowerCase() === origin.hostname.toLowerCase()
+      ) {
         return {
           canonicalUrl: stripLocalePrefix(url.pathname),
           convertedFromOwnHost: true,
