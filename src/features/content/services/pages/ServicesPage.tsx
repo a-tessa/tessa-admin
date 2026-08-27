@@ -150,9 +150,13 @@ function ServicePreview({ service }: { service: ServicePage }) {
         <div className="relative h-40 w-full max-w-sm overflow-hidden rounded-lg border bg-muted">
           <ImageThumbnail
             src={service.backgroundImageUrl}
-            alt={`Fundo — ${service.title}`}
+            alt={service.backgroundImageAlt?.trim() || `Fundo — ${service.title}`}
           />
         </div>
+        <p className="text-xs text-muted-foreground">
+          {service.backgroundImageAlt?.trim() ||
+            "Sem texto alternativo. Obrigatório na próxima edição."}
+        </p>
         <p className="text-xs text-muted-foreground break-all">
           {service.backgroundImageUrl}
         </p>
@@ -180,7 +184,10 @@ function ServicePreview({ service }: { service: ServicePage }) {
                 <div className="relative aspect-square overflow-hidden rounded-lg border bg-muted transition-shadow group-hover:shadow-md">
                   <ImageThumbnail
                     src={image.imgUrl}
-                    alt={`Imagem ${String(index + 1)} — ${service.title}`}
+                    alt={
+                      image.alt?.trim() ||
+                      `Imagem ${String(index + 1)} — ${service.title}`
+                    }
                   />
                   <div className="absolute bottom-1 right-1">
                     <Badge
@@ -191,8 +198,11 @@ function ServicePreview({ service }: { service: ServicePage }) {
                     </Badge>
                   </div>
                 </div>
-                <p className="truncate text-[10px] text-muted-foreground" title={image.imgUrl}>
-                  {image.imgUrl}
+                <p
+                  className="line-clamp-2 text-[10px] text-muted-foreground"
+                  title={image.alt?.trim() || image.imgUrl}
+                >
+                  {image.alt?.trim() || "Sem texto alternativo"}
                 </p>
               </div>
             ))}
@@ -266,7 +276,7 @@ function ServiceCard({
             <div className="relative size-10 shrink-0 overflow-hidden rounded-md border bg-muted">
               <ImageThumbnail
                 src={service.backgroundImageUrl}
-                alt={service.title}
+                alt={service.backgroundImageAlt?.trim() || service.title}
               />
             </div>
 

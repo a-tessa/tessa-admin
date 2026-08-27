@@ -1,5 +1,6 @@
 export interface ServicePageImage {
   imgUrl: string
+  alt?: string
 }
 
 export interface ServicePage {
@@ -9,6 +10,7 @@ export interface ServicePage {
   subtitle: string
   exampleVideoUrl: string
   backgroundImageUrl: string
+  backgroundImageAlt?: string
   images: ServicePageImage[]
 }
 
@@ -27,6 +29,7 @@ export interface ServicePageAssetUploadResponse extends ServicePageAssetMeta {
 
 export interface ServicePageFormPayloadImage {
   imgUrl?: string
+  alt?: string
   meta?: ServicePageAssetMeta
 }
 
@@ -37,6 +40,7 @@ export interface ServicePageFormPayload {
   subtitle: string
   exampleVideoUrl: string
   backgroundImageUrl?: string
+  backgroundImageAlt: string
   backgroundImageMeta?: ServicePageAssetMeta
   images: ServicePageFormPayloadImage[]
 }

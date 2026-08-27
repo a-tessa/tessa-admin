@@ -58,6 +58,7 @@ async function resolveUploads(data: ServicePageFormData): Promise<ServicePageFor
       uploads.push(
         uploadServicePageAsset(payload.slug, file, 'image', index).then((asset) => {
           const nextImage: ServicePageFormPayloadImage = {
+            ...payload.images[index],
             imgUrl: asset.url,
             meta: {
               pathname: asset.pathname,

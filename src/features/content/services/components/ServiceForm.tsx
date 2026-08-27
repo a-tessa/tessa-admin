@@ -25,7 +25,7 @@ import {
   Upload,
 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { useFieldArray, useForm, useFormContext } from 'react-hook-form'
 import { z } from 'zod'
 import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
@@ -54,6 +54,7 @@ import type { ServicePage, ServicePageFormData, ServicePageFormPayload } from '.
 
 const ACCEPTED_IMAGE_TYPES = 'image/jpeg,image/png,image/webp,image/gif'
 const MAX_FILE_SIZE_BYTES = 4 * 1024 * 1024
+const MAX_SERVICE_IMAGE_ALT_LENGTH = 100
 
 const serviceFormSchema = z.object({
   title: z.string().trim().min(1, 'Título é obrigatório.'),
@@ -69,8 +70,28 @@ const serviceFormSchema = z.object({
   subtitle: z.string().trim().min(1, 'Subtítulo é obrigatório.'),
   exampleVideoUrl: z.string().trim().min(1, 'URL do vídeo é obrigatória.'),
   backgroundImageUrl: z.string().optional(),
+  backgroundImageAlt: z
+    .string()
+    .trim()
+    .min(1, 'Descreva a imagem de topo.')
+    .max(
+      MAX_SERVICE_IMAGE_ALT_LENGTH,
+      `O texto alternativo pode ter no máximo ${String(MAX_SERVICE_IMAGE_ALT_LENGTH)} caracteres.`,
+    ),
   images: z
-    .array(z.object({ imgUrl: z.string().optional() }))
+    .array(
+      z.object({
+        imgUrl: z.string().optional(),
+        alt: z
+          .string()
+          .trim()
+          .min(1, 'Descreva a imagem.')
+          .max(
+            MAX_SERVICE_IMAGE_ALT_LENGTH,
+            `O texto alternativo pode ter no máximo ${String(MAX_SERVICE_IMAGE_ALT_LENGTH)} caracteres.`,
+          ),
+      }),
+    )
     .min(1, 'Adicione ao menos uma imagem de galeria.'),
 })
 
@@ -122,6 +143,7 @@ function SortableImageItem({
   onReplace: (file: File) => void
   onRemove: () => void
 }) {
+  const { control } = useFormContext<ServiceFormValues>()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const {
     attributes,
@@ -208,8 +230,42 @@ function SortableImageItem({
           <Trash2 className="size-4" />
         </Button>
       </div>
+
+      <FormField
+        control={control}
+        name={`images.${index}.alt`}
+        render={({ field }) => (
+          <FormItem className="border-t px-2.5 py-2">
+            <div className="flex items-center justify-between gap-2">
+              <FormLabel className="text-xs">Texto alternativo</FormLabel>
+              <span className="font-mono text-[10px] tabular-nums text-muted-foreground">
+                {String(field.value?.length ?? 0)} / {String(MAX_SERVICE_IMAGE_ALT_LENGTH)}
+              </span>
+            </div>
+            <FormControl>
+              <Input
+                {...field}
+                maxLength={MAX_SERVICE_IMAGE_ALT_LENGTH}
+                placeholder="Descreva o que aparece na foto, sem repetir o título."
+                className="h-8 text-xs"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   )
+}
+
+function toFormImages(
+  images: ServicePage['images'] | undefined,
+): ServiceFormValues['images'] {
+  if (!images?.length) return []
+  return images.map((image) => ({
+    imgUrl: image.imgUrl,
+    alt: image.alt ?? '',
+  }))
 }
 
 export interface ServiceFormProps {
@@ -253,9 +309,8 @@ export function ServiceForm({
       subtitle: service?.subtitle ?? '',
       exampleVideoUrl: service?.exampleVideoUrl ?? '',
       backgroundImageUrl: service?.backgroundImageUrl ?? '',
-      images: service?.images.length
-        ? service.images
-        : [],
+      backgroundImageAlt: service?.backgroundImageAlt ?? '',
+      images: toFormImages(service?.images),
     },
   })
 
@@ -293,9 +348,8 @@ export function ServiceForm({
       subtitle: service?.subtitle ?? '',
       exampleVideoUrl: service?.exampleVideoUrl ?? '',
       backgroundImageUrl: service?.backgroundImageUrl ?? '',
-      images: service?.images.length
-        ? service.images
-        : [],
+      backgroundImageAlt: service?.backgroundImageAlt ?? '',
+      images: toFormImages(service?.images),
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetKey, service, form])
@@ -369,7 +423,7 @@ export function ServiceForm({
 
     pendingFilesRef.current.push(...validFiles)
     validFiles.forEach(() => {
-      append({ imgUrl: '' })
+      append({ imgUrl: '', alt: '' })
     })
 
     e.target.value = ''
@@ -440,13 +494,14 @@ export function ServiceForm({
     }
 
     let hasImageError = false
-    const imagesPayload: { imgUrl?: string }[] = []
+    const imagesPayload: { imgUrl?: string; alt: string }[] = []
     const galleryFiles = new Map<number, File>()
 
     for (let i = 0; i < fields.length; i++) {
       const field = fields[i]
       const file = galleryFilesRef.current.get(field?.id ?? '')
       const imgUrl = values.images[i]?.imgUrl
+      const alt = values.images[i]?.alt ?? ''
 
       if (!file && (!imgUrl || imgUrl.length === 0)) {
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
@@ -457,9 +512,9 @@ export function ServiceForm({
 
       if (file) {
         galleryFiles.set(i, file)
-        imagesPayload.push({})
+        imagesPayload.push({ alt })
       } else {
-        imagesPayload.push(imgUrl ? { imgUrl } : {})
+        imagesPayload.push(imgUrl ? { imgUrl, alt } : { alt })
       }
     }
 
@@ -471,6 +526,7 @@ export function ServiceForm({
       category: values.category,
       subtitle: values.subtitle,
       exampleVideoUrl: values.exampleVideoUrl,
+      backgroundImageAlt: values.backgroundImageAlt,
       images: imagesPayload,
     }
     if (!hasBgFile) {
@@ -661,6 +717,32 @@ export function ServiceForm({
           )}
         />
 
+        <FormField
+          control={form.control}
+          name="backgroundImageAlt"
+          render={({ field }) => (
+            <FormItem>
+              <div className="flex items-center justify-between gap-2">
+                <FormLabel>Texto alternativo do topo</FormLabel>
+                <span className="font-mono text-xs tabular-nums text-muted-foreground">
+                  {String(field.value?.length ?? 0)} / {String(MAX_SERVICE_IMAGE_ALT_LENGTH)}
+                </span>
+              </div>
+              <FormControl>
+                <Input
+                  {...field}
+                  maxLength={MAX_SERVICE_IMAGE_ALT_LENGTH}
+                  placeholder="Descreva o que aparece na foto, sem repetir o título."
+                />
+              </FormControl>
+              <FormDescription>
+                Descreve a foto do topo para busca e compartilhamento.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Separator />
 
         <div className="space-y-3">
@@ -668,7 +750,8 @@ export function ServiceForm({
             <div>
               <p className="text-sm font-medium">Galeria de imagens</p>
               <p className="text-xs text-muted-foreground">
-                De 1 a 15 imagens. Arraste para reorganizar.
+                De 1 a 15 imagens. Arraste para reorganizar. Cada foto precisa
+                de um texto alternativo.
               </p>
             </div>
 
