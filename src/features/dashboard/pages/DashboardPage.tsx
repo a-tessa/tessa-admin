@@ -3,7 +3,6 @@ import {
   ArrowRight,
   Clock,
   FileDown,
-  FileText,
   GlobeIcon,
   Image,
   Inbox,
@@ -218,30 +217,6 @@ export function DashboardPage() {
           </Card>
         ))}
       </div>
-
-      <Card className="transition-shadow hover:shadow-md">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
-              <FileText className="size-5 text-primary" />
-            </div>
-            <div>
-              <CardTitle className="text-base">Conteúdos</CardTitle>
-              <CardDescription>
-                Gerenciar landing pages, rascunhos e publicações.
-              </CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Button variant="ghost" size="sm" className="gap-2" asChild>
-            <Link to="/conteudo">
-              Acessar
-              <ArrowRight className="size-4" />
-            </Link>
-          </Button>
-        </CardContent>
-      </Card>
     </div>
   )
 }

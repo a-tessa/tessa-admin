@@ -160,6 +160,22 @@ describe('navegação da Página inicial', () => {
     })
   })
 
+  it('redireciona a listagem antiga de conteúdos para a Página inicial', async () => {
+    const router = createRouter({
+      routeTree,
+      history: createMemoryHistory({
+        initialEntries: ['/conteudo'],
+      }),
+    })
+
+    render(<RouterProvider router={router} />)
+
+    expect(await screen.findByText('Página inicial')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/conteudo/pagina-inicial')
+    })
+  })
+
   it('redireciona o endereço legado para a aba Seção Principal', async () => {
     const router = createRouter({
       routeTree,

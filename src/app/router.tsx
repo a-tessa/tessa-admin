@@ -28,7 +28,6 @@ import { validateHomePageSearch } from '@/features/content/homepage/homepage-sea
 import { HomePagePage } from '@/features/content/homepage/pages/HomePagePage'
 import { InstagramPage } from '@/features/content/instagram/pages/InstagramPage'
 import { ContentPageEditPage } from '@/features/content/pages/ContentPageEditPage'
-import { ContentPagesPage } from '@/features/content/pages/ContentPagesPage'
 import { RepresentantsPage } from '@/features/content/representants/pages/RepresentantsPage'
 import { ScenerySectionPage } from '@/features/content/scenery/pages/ScenerySectionPage'
 import { ServicesPage } from '@/features/content/services/pages/ServicesPage'
@@ -86,7 +85,7 @@ const dashboardRoute = createRoute({
 const contentRoute = createRoute({
   getParentRoute: () => appRoute,
   path: 'conteudo',
-  component: ContentPagesPage,
+  component: () => <Navigate to="/conteudo/pagina-inicial" replace />,
 })
 
 const contentHomepageRoute = createRoute({
