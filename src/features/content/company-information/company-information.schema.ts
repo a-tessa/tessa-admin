@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import {
   formatBrazilMobileDisplay,
+  formatBrazilPhoneDisplay,
+  formatCepDisplay,
   formatCnpjDisplay,
   isCompleteCnpj,
   isValidBrazilMobile,
@@ -111,10 +113,12 @@ export const defaultCompanyInformationFormValues: CompanyInformationFormValues =
     name: DEFAULT_COMPANY_NAME,
     cnpj: '',
     address: DEFAULT_COMPANY_ADDRESS,
-    zipCode: DEFAULT_COMPANY_ZIP_CODE,
+    zipCode: formatCepDisplay(DEFAULT_COMPANY_ZIP_CODE),
     email: DEFAULT_COMPANY_EMAIL,
     whatsapp: '',
-    phoneContacts: DEFAULT_COMPANY_PHONES.map((phone) => ({ phone })),
+    phoneContacts: DEFAULT_COMPANY_PHONES.map((phone) => ({
+      phone: formatBrazilPhoneDisplay(phone),
+    })),
   }
 
 export function toCompanyInformationFormValues(
@@ -123,14 +127,16 @@ export function toCompanyInformationFormValues(
   if (!section) return defaultCompanyInformationFormValues
 
   const phoneContacts = section.phoneContacts
-    .map((contact) => ({ phone: contact.phone.trim() }))
+    .map((contact) => ({
+      phone: formatBrazilPhoneDisplay(contact.phone),
+    }))
     .filter((contact) => contact.phone.length > 0)
 
   return {
     name: section.name,
     cnpj: formatCnpjDisplay(section.cnpj),
     address: section.address,
-    zipCode: section.zipCode,
+    zipCode: formatCepDisplay(section.zipCode),
     email: section.email,
     whatsapp: formatBrazilMobileDisplay(section.whatsapp ?? ''),
     phoneContacts:
@@ -147,11 +153,11 @@ export function toCompanyInformationInput(
     name: values.name.trim(),
     cnpj: formatCnpjDisplay(values.cnpj),
     address: values.address.trim(),
-    zipCode: values.zipCode.trim(),
+    zipCode: formatCepDisplay(values.zipCode),
     email: values.email.trim(),
     whatsapp: formatBrazilMobileDisplay(values.whatsapp),
     phoneContacts: values.phoneContacts.map((contact) => ({
-      phone: contact.phone.trim(),
+      phone: formatBrazilPhoneDisplay(contact.phone),
     })),
   }
 }

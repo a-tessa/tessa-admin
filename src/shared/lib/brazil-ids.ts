@@ -1,5 +1,5 @@
 /**
- * Digits-only CPF/CNPJ helpers and Brazilian phone display helpers.
+ * Digits-only CPF/CNPJ/CEP helpers and Brazilian phone display helpers.
  */
 
 export function normalizeCpfDigits(raw: string): string {
@@ -31,6 +31,17 @@ export function formatCnpjDisplay(digitsOrRaw: string): string {
 
 export function isCompleteCnpj(raw: string): boolean {
   return normalizeCnpjDigits(raw).length === 14
+}
+
+export function normalizeCepDigits(raw: string): string {
+  return raw.replace(/\D/g, '').slice(0, 8)
+}
+
+/** Máscara 00000-000. */
+export function formatCepDisplay(digitsOrRaw: string): string {
+  const digits = normalizeCepDigits(digitsOrRaw)
+  if (digits.length <= 5) return digits
+  return `${digits.slice(0, 5)}-${digits.slice(5)}`
 }
 
 function cpfCheckDigit(base: string, factorStart: number): number {

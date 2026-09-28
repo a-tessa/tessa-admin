@@ -68,6 +68,8 @@ import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Textarea } from '@/shared/components/ui/textarea'
 import {
   formatBrazilMobileDisplay,
+  formatBrazilPhoneDisplay,
+  formatCepDisplay,
   formatCnpjDisplay,
   normalizeBrazilPhoneDigits,
 } from '@/shared/lib/brazil-ids'
@@ -339,10 +341,14 @@ export function CompanyInformationEditor() {
                     <FormLabel>CEP</FormLabel>
                     <FormControl>
                       <Input
+                        inputMode="numeric"
                         maxLength={MAX_COMPANY_ZIP_CODE_LENGTH}
                         autoComplete="postal-code"
                         placeholder="00000-000"
                         {...field}
+                        onChange={(event): void => {
+                          field.onChange(formatCepDisplay(event.target.value))
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -419,11 +425,22 @@ export function CompanyInformationEditor() {
                       <div className="flex items-start gap-2">
                         <FormControl>
                           <Input
+                            type="tel"
                             maxLength={MAX_COMPANY_PHONE_LENGTH}
                             inputMode="tel"
                             autoComplete="tel"
+                            placeholder="(00) 00000-0000"
                             aria-label={`Telefone ${String(index + 1)}`}
                             {...field}
+                            onChange={(event): void => {
+                              field.onChange(
+                                formatBrazilPhoneDisplay(
+                                  normalizeBrazilPhoneDigits(
+                                    event.target.value,
+                                  ),
+                                ),
+                              )
+                            }}
                           />
                         </FormControl>
                         {fields.length > 1 ? (

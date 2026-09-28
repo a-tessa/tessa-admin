@@ -44,8 +44,54 @@ describe('company-information.schema', () => {
       zipCode: '15110-000',
       email: 'contato@tessa.com.br',
       whatsapp: '(17) 99999-1234',
-      phoneContacts: [{ phone: '+55 17 3267-1220' }],
+      phoneContacts: [{ phone: '(17) 3267-1220' }],
     })
+  })
+
+  it('aplica a máscara de CEP ao carregar e ao enviar', () => {
+    expect(
+      toCompanyInformationFormValues({
+        name: 'Tessa LTDA',
+        cnpj: '00.000.000/0001-00',
+        address: 'Rua Exemplo, 123',
+        zipCode: '15113899',
+        email: 'contato@tessa.com.br',
+        phoneContacts: [{ phone: '+55 17 3267-1220' }],
+      }).zipCode,
+    ).toBe('15113-899')
+
+    expect(
+      toCompanyInformationInput({
+        ...validValues,
+        zipCode: 'abc15110000',
+      }).zipCode,
+    ).toBe('15110-000')
+  })
+
+  it('aplica a máscara de telefone ao carregar e ao enviar', () => {
+    expect(
+      toCompanyInformationFormValues({
+        name: 'Tessa LTDA',
+        cnpj: '00.000.000/0001-00',
+        address: 'Rua Exemplo, 123',
+        zipCode: '15110-000',
+        email: 'contato@tessa.com.br',
+        phoneContacts: [
+          { phone: '+55 17 3267-1220' },
+          { phone: '17999991234' },
+        ],
+      }).phoneContacts,
+    ).toEqual([
+      { phone: '(17) 3267-1220' },
+      { phone: '(17) 99999-1234' },
+    ])
+
+    expect(
+      toCompanyInformationInput({
+        ...validValues,
+        phoneContacts: [{ phone: '17999991234' }],
+      }).phoneContacts,
+    ).toEqual([{ phone: '(17) 99999-1234' }])
   })
 
   it('aplica a máscara de CNPJ ao carregar dígitos crus', () => {
