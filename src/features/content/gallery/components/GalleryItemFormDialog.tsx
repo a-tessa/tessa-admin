@@ -4,6 +4,7 @@ import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { categoriesListQuery } from '@/features/content/categories/categories.queries'
+import { UnpublishedCategoryNotice } from '@/features/content/categories/components/UnpublishedCategoryNotice'
 import { Button } from '@/shared/components/ui/button'
 import {
   Dialog,
@@ -259,6 +260,13 @@ export function GalleryItemFormDialog({
                       </SelectContent>
                     </Select>
                     <FormMessage />
+                    <UnpublishedCategoryNotice
+                      categorySlug={
+                        !field.value || field.value === NONE_CATEGORY
+                          ? ''
+                          : field.value
+                      }
+                    />
                   </FormItem>
                 )}
               />
@@ -378,6 +386,13 @@ export function GalleryItemFormDialog({
                       </SelectContent>
                     </Select>
                     <FormMessage />
+                    <UnpublishedCategoryNotice
+                      categorySlug={
+                        !field.value || field.value === NONE_CATEGORY
+                          ? ''
+                          : field.value
+                      }
+                    />
                   </FormItem>
                 )}
               />

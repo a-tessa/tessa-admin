@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { Controller, useForm, type SubmitHandler } from 'react-hook-form'
 import { z } from 'zod'
 import { categoriesListQuery } from '@/features/content/categories/categories.queries'
+import { UnpublishedCategoryNotice } from '@/features/content/categories/components/UnpublishedCategoryNotice'
 import { Button } from '@/shared/components/ui/button'
 import { Card, CardContent } from '@/shared/components/ui/card'
 import {
@@ -325,6 +326,7 @@ export function BlogArticleForm({
                         </SelectContent>
                       </Select>
                       <FormMessage />
+                      <UnpublishedCategoryNotice categorySlug={field.value} />
                     </FormItem>
                   )}
                 />

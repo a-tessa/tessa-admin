@@ -50,6 +50,7 @@ import { Textarea } from '@/shared/components/ui/textarea'
 import { Separator } from '@/shared/components/ui/separator'
 import { cn } from '@/shared/lib/utils'
 import { useCategories } from '../../categories'
+import { UnpublishedCategoryNotice } from '../../categories/components/UnpublishedCategoryNotice'
 import type { ServicePage, ServicePageFormData, ServicePageFormPayload } from '../types'
 
 const ACCEPTED_IMAGE_TYPES = 'image/jpeg,image/png,image/webp,image/gif'
@@ -622,6 +623,7 @@ export function ServiceForm({
                 </SelectContent>
               </Select>
               <FormMessage />
+              <UnpublishedCategoryNotice categorySlug={field.value} />
             </FormItem>
           )}
         />

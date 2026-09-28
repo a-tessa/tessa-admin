@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { categoriesListQuery } from '@/features/content/categories/categories.queries'
+import { UnpublishedCategoryNotice } from '@/features/content/categories/components/UnpublishedCategoryNotice'
 import { Button } from '@/shared/components/ui/button'
 import {
   Dialog,
@@ -190,6 +191,7 @@ export function DocumentFormDialog({
                       Use categorias já publicadas na landing.
                     </FormDescription>
                     <FormMessage />
+                    <UnpublishedCategoryNotice categorySlug={field.value} />
                   </FormItem>
                 )}
               />
