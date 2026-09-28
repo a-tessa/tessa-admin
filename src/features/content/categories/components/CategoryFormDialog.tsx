@@ -75,7 +75,7 @@ export function CategoryFormDialog({
 
   useEffect(() => {
     if (open) {
-      slugManuallyEditedRef.current = false
+      slugManuallyEditedRef.current = Boolean(category?.slug)
       form.reset({
         name: category?.name ?? '',
         slug: category?.slug ?? '',
@@ -153,8 +153,9 @@ export function CategoryFormDialog({
                     />
                   </FormControl>
                   <FormDescription>
-                    Gerado do nome enquanto você digita. Edite aqui para um slug
-                    personalizado.
+                    {isEditing
+                      ? 'O endereço só muda se você editar o slug.'
+                      : 'Gerado do nome enquanto você digita. Edite aqui para um slug personalizado.'}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
