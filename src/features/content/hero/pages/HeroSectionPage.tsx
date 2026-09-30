@@ -23,6 +23,7 @@ import { useCreateHeroSection } from '../hooks/use-create-hero-section'
 import { useUpdateHeroSection } from '../hooks/use-update-hero-section'
 import { useDeleteHeroSection } from '../hooks/use-delete-hero-section'
 import { useDeleteHeroSectionSlide } from '../hooks/use-delete-hero-section-slide'
+import { HERO_MAX_TOPICS } from '../constants'
 import {
   HeroTopicEditDialog,
   type HeroTopicEditResult,
@@ -170,6 +171,7 @@ export function HeroSectionPage() {
 
   const heroSection = heroQuery.data?.heroSection
   const hasHero = heroSection && heroSection.length > 0
+  const isAtTopicLimit = (heroSection?.length ?? 0) >= HERO_MAX_TOPICS
   const isMutating =
     createMutation.isPending ||
     updateMutation.isPending ||
@@ -191,6 +193,8 @@ export function HeroSectionPage() {
   )
 
   function openCreate() {
+    if (isAtTopicLimit) return
+
     setEditingIndex(null)
     setDialogOpen(true)
   }
@@ -242,6 +246,13 @@ export function HeroSectionPage() {
         onError: (error) => toast.error(error.message),
       })
     } else if (hasHero) {
+      if (heroSection.length >= HERO_MAX_TOPICS) {
+        toast.error(
+          `A seção principal aceita no máximo ${String(HERO_MAX_TOPICS)} tópicos.`,
+        )
+        return
+      }
+
       const newIndex = heroSection.length
       const updatedTopics: HeroTopicInput[] = [
         ...heroSection.map((t) => ({ ...t })),
@@ -310,11 +321,17 @@ export function HeroSectionPage() {
               size="sm"
               className="gap-2"
               onClick={openCreate}
-              disabled={isMutating}
+              disabled={isMutating || isAtTopicLimit}
+              aria-describedby={isAtTopicLimit ? 'hero-topic-limit' : undefined}
             >
               <Plus className="size-4" />
               Novo tópico
             </Button>
+          ) : null}
+          {isAtTopicLimit ? (
+            <p id="hero-topic-limit" className="text-xs text-muted-foreground">
+              máx. {HERO_MAX_TOPICS} tópicos
+            </p>
           ) : null}
 
           {hasHero ? (
