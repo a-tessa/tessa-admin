@@ -15,13 +15,16 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Link } from '@tanstack/react-router'
 import {
+  ExternalLink,
   GripVertical,
   ImageIcon,
   Loader2,
   Plus,
   RefreshCw,
   Trash2,
+  TriangleAlert,
   Upload,
 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -294,6 +297,8 @@ export function ServiceForm({
   const galleryFileInputRef = useRef<HTMLInputElement>(null)
   const categoriesQuery = useCategories()
   const categories = categoriesQuery.data?.categories ?? []
+  const hasNoCategories =
+    categoriesQuery.isSuccess && categories.length === 0
 
   const galleryFilesRef = useRef(new Map<string, File>())
   const [galleryPreviews, setGalleryPreviews] = useState(new Map<string, string>())
@@ -623,22 +628,64 @@ export function ServiceForm({
               <FormLabel>Categoria</FormLabel>
               <Select
                 onValueChange={field.onChange}
-                value={field.value}
+                value={field.value || undefined}
               >
                 <FormControl>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecione uma categoria" />
+                    <SelectValue
+                      placeholder={
+                        categoriesQuery.isPending
+                          ? 'Carregando categorias...'
+                          : hasNoCategories
+                            ? 'Ainda não há categoria criada para incluir um novo serviço.'
+                            : 'Selecione uma categoria'
+                      }
+                    />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.slug} value={cat.slug}>
-                      {cat.name}
-                    </SelectItem>
-                  ))}
+                  {hasNoCategories ? (
+                    <p className="px-2 py-2 text-sm leading-relaxed whitespace-normal text-muted-foreground">
+                      Ainda não há categoria criada para incluir um novo
+                      serviço.
+                    </p>
+                  ) : (
+                    categories.map((cat) => (
+                      <SelectItem key={cat.slug} value={cat.slug}>
+                        {cat.name}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
               <FormMessage />
+              {!service && hasNoCategories ? (
+                <div
+                  role="alert"
+                  className="flex items-start gap-2.5 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-100"
+                >
+                  <TriangleAlert className="mt-0.5 size-4 shrink-0" />
+                  <div className="space-y-2">
+                    <p className="font-medium leading-tight">
+                      Nenhuma categoria cadastrada
+                    </p>
+                    <p className="text-xs leading-relaxed">
+                      Crie uma categoria antes de incluir um novo serviço.
+                    </p>
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="gap-1 border-amber-300 bg-white text-amber-900 hover:bg-amber-50 hover:text-amber-900 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-100 dark:hover:bg-amber-950/80"
+                    >
+                      <Link to="/conteudo/categorias">
+                        <ExternalLink className="size-3.5" />
+                        Criar categoria
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              ) : null}
               <UnpublishedCategoryNotice categorySlug={field.value} />
             </FormItem>
           )}
