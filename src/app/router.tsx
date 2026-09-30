@@ -85,7 +85,13 @@ const dashboardRoute = createRoute({
 const contentRoute = createRoute({
   getParentRoute: () => appRoute,
   path: 'conteudo',
-  component: () => <Navigate to="/conteudo/pagina-inicial" replace />,
+  component: () => (
+    <Navigate
+      to="/conteudo/pagina-inicial"
+      search={{ aba: 'secao-principal' }}
+      replace
+    />
+  ),
 })
 
 const contentHomepageRoute = createRoute({

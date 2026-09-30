@@ -173,6 +173,9 @@ describe('navegação da Página inicial', () => {
     expect(await screen.findByText('Página inicial')).toBeInTheDocument()
     await waitFor(() => {
       expect(router.state.location.pathname).toBe('/conteudo/pagina-inicial')
+      expect(router.state.location.search).toEqual({
+        aba: 'secao-principal',
+      })
     })
   })
 
