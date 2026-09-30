@@ -628,7 +628,7 @@ export function ServiceForm({
               <FormLabel>Categoria</FormLabel>
               <Select
                 onValueChange={field.onChange}
-                value={field.value || undefined}
+                {...(field.value ? { value: field.value } : {})}
               >
                 <FormControl>
                   <SelectTrigger className="w-full">

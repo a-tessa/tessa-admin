@@ -57,7 +57,7 @@ describe('ServiceForm category dropdown', () => {
       isSuccess: true,
       isPending: false,
       isError: false,
-    } as ReturnType<typeof useCategories>)
+    } as unknown as ReturnType<typeof useCategories>)
 
     renderForm()
 
@@ -88,7 +88,7 @@ describe('ServiceForm category dropdown', () => {
       isSuccess: true,
       isPending: false,
       isError: false,
-    } as ReturnType<typeof useCategories>)
+    } as unknown as ReturnType<typeof useCategories>)
 
     renderForm()
 
