@@ -31,49 +31,38 @@ async function uploadServicePageAsset(
   })
 }
 
+function assetMeta(asset: ServicePageAssetUploadResponse) {
+  return {
+    pathname: asset.pathname,
+    mimeType: asset.mimeType,
+    sizeBytes: asset.sizeBytes,
+    originalFilename: asset.originalFilename,
+  }
+}
+
 async function resolveUploads(data: ServicePageFormData): Promise<ServicePageFormPayload> {
   const payload: ServicePageFormPayload = {
     ...data.payload,
     images: data.payload.images.map((image) => ({ ...image })),
   }
 
-  const uploads: Promise<void>[] = []
-
   if (data.backgroundImage) {
-    uploads.push(
-      uploadServicePageAsset(payload.slug, data.backgroundImage, 'background').then((asset) => {
-        payload.backgroundImageUrl = asset.url
-        payload.backgroundImageMeta = {
-          pathname: asset.pathname,
-          mimeType: asset.mimeType,
-          sizeBytes: asset.sizeBytes,
-          originalFilename: asset.originalFilename,
-        }
-      }),
-    )
+    const asset = await uploadServicePageAsset(payload.slug, data.backgroundImage, 'background')
+    payload.backgroundImageUrl = asset.url
+    payload.backgroundImageMeta = assetMeta(asset)
   }
 
   if (data.galleryFiles && data.galleryFiles.size > 0) {
     for (const [index, file] of data.galleryFiles) {
-      uploads.push(
-        uploadServicePageAsset(payload.slug, file, 'image', index).then((asset) => {
-          const nextImage: ServicePageFormPayloadImage = {
-            ...payload.images[index],
-            imgUrl: asset.url,
-            meta: {
-              pathname: asset.pathname,
-              mimeType: asset.mimeType,
-              sizeBytes: asset.sizeBytes,
-              originalFilename: asset.originalFilename,
-            },
-          }
-          payload.images[index] = nextImage
-        }),
-      )
+      const asset = await uploadServicePageAsset(payload.slug, file, 'image', index)
+      const nextImage: ServicePageFormPayloadImage = {
+        ...payload.images[index],
+        imgUrl: asset.url,
+        meta: assetMeta(asset),
+      }
+      payload.images[index] = nextImage
     }
   }
-
-  await Promise.all(uploads)
 
   return payload
 }
