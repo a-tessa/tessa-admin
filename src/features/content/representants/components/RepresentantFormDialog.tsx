@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, ChevronsUpDown, Loader2, Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 import { Button } from '@/shared/components/ui/button'
 import {
   Command,
@@ -43,30 +42,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select'
+import { normalizeBrazilPhoneDigits } from '@/shared/lib/brazil-ids'
 import { cn } from '@/shared/lib/utils'
 import { useRepresentantSegments } from '../hooks/use-representant-segments'
 import { BRAZILIAN_STATES } from '../constants'
+import {
+  formatRepresentantPhone,
+  representantFormSchema,
+  type RepresentantFormValues,
+} from '../representant-form.schema'
 import type { Representant, RepresentantInput } from '../types'
-
-const representantFormSchema = z.object({
-  name: z.string().trim().min(1, 'Nome é obrigatório.').max(120),
-  companyName: z
-    .string()
-    .trim()
-    .min(1, 'Nome da empresa é obrigatório.')
-    .max(160),
-  segment: z.string().trim().min(1, 'Segmento é obrigatório.').max(120),
-  phone: z.string().trim().min(1, 'Telefone é obrigatório.').max(40),
-  city: z.string().trim().min(1, 'Cidade é obrigatória.').max(120),
-  state: z.string().trim().min(1, 'Estado é obrigatório.').max(120),
-  email: z
-    .email('Email inválido.')
-    .trim()
-    .min(1, 'Email é obrigatório.')
-    .max(255),
-})
-
-type RepresentantFormValues = z.infer<typeof representantFormSchema>
 
 const defaultValues: RepresentantFormValues = {
   name: '',
@@ -141,7 +126,9 @@ export function RepresentantFormDialog({
       name: representant?.name ?? '',
       companyName: representant?.companyName ?? '',
       segment: representant?.segment ?? '',
-      phone: representant?.phone ?? '',
+      phone: representant?.phone
+        ? formatRepresentantPhone(representant.phone)
+        : '',
       city: representant?.city ?? '',
       state: representant?.state ?? '',
       email: representant?.email ?? '',
@@ -157,7 +144,7 @@ export function RepresentantFormDialog({
       name: values.name,
       companyName: values.companyName,
       segment: values.segment,
-      phone: values.phone,
+      phone: formatRepresentantPhone(values.phone),
       city: values.city,
       state: values.state,
       email: values.email,
@@ -254,10 +241,19 @@ export function RepresentantFormDialog({
                   <FormLabel>Telefone</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Ex: (11) 99999-9999"
+                      type="tel"
                       inputMode="tel"
                       autoComplete="tel"
+                      placeholder="(00) 0000-0000"
+                      maxLength={15}
                       {...field}
+                      onChange={(event) => {
+                        field.onChange(
+                          formatRepresentantPhone(
+                            normalizeBrazilPhoneDigits(event.target.value),
+                          ),
+                        )
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
