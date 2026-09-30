@@ -1,6 +1,7 @@
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
+import { ApiError } from '@/shared/lib/api'
 import { Button } from '@/shared/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card'
 import { Skeleton } from '@/shared/components/ui/skeleton'
@@ -15,6 +16,8 @@ export function BlogArticleEditPage() {
   const navigate = useNavigate()
   const articleQuery = useBlogArticle(slug)
   const updateMutation = useUpdateBlogArticle()
+  const isNotFound =
+    articleQuery.error instanceof ApiError && articleQuery.error.status === 404
 
   return (
     <div className="space-y-6">
@@ -28,7 +31,9 @@ export function BlogArticleEditPage() {
           </Button>
           <div className="flex items-center gap-3">
             <h2 className="text-2xl font-semibold tracking-tight">
-              {articleQuery.data?.article.title ?? 'Editar artigo'}
+              {isNotFound
+                ? 'Artigo não encontrado'
+                : (articleQuery.data?.article.title ?? 'Editar artigo')}
             </h2>
             {articleQuery.data ? (
               <BlogArticleStatusBadge
@@ -36,9 +41,11 @@ export function BlogArticleEditPage() {
               />
             ) : null}
           </div>
-          <p className="text-sm text-muted-foreground">
-            Atualize o conteúdo, troque o status ou ajuste os metadados.
-          </p>
+          {isNotFound ? null : (
+            <p className="text-sm text-muted-foreground">
+              Atualize o conteúdo, troque o status ou ajuste os metadados.
+            </p>
+          )}
         </div>
       </div>
 
@@ -49,7 +56,17 @@ export function BlogArticleEditPage() {
         </div>
       ) : null}
 
-      {articleQuery.isError ? (
+      {isNotFound ? (
+        <Card>
+          <CardContent className="py-6">
+            <Button asChild variant="outline">
+              <Link to="/conteudo/blog">Voltar para a lista</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {articleQuery.isError && !isNotFound ? (
         <Card>
           <CardHeader>
             <CardTitle className="text-destructive">

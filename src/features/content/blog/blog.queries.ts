@@ -1,4 +1,5 @@
 import { queryOptions } from '@tanstack/react-query'
+import { ApiError } from '@/shared/lib/api'
 import {
   fetchAdminBlogArticles,
   fetchBlogArticleBySlug,
@@ -26,5 +27,15 @@ export function blogArticleDetailQuery(slug: string) {
     queryKey: blogKeys.detail(slug),
     queryFn: () => fetchBlogArticleBySlug(slug),
     enabled: slug !== '',
+    retry: (failureCount, error) => {
+      if (
+        error instanceof ApiError &&
+        (error.status === 404 || error.status === 401)
+      ) {
+        return false
+      }
+
+      return failureCount < 3
+    },
   })
 }
