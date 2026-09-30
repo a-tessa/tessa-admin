@@ -1,4 +1,5 @@
 import { authenticatedRequest } from '@/shared/lib/api'
+import { downscaleServiceImage } from './downscale-service-image'
 import type {
   ServicePageAssetUploadResponse,
   ServicePageFormData,
@@ -17,10 +18,11 @@ async function uploadServicePageAsset(
   kind: 'background' | 'image',
   index?: number,
 ): Promise<ServicePageAssetUploadResponse> {
+  const prepared = await downscaleServiceImage(file)
   const formData = new FormData()
   formData.append('slug', slug)
   formData.append('kind', kind)
-  formData.append('file', file)
+  formData.append('file', prepared)
   if (kind === 'image' && typeof index === 'number') {
     formData.append('index', String(index))
   }

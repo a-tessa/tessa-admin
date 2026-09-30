@@ -51,6 +51,7 @@ import { Separator } from '@/shared/components/ui/separator'
 import { cn } from '@/shared/lib/utils'
 import { useCategories } from '../../categories'
 import { UnpublishedCategoryNotice } from '../../categories/components/UnpublishedCategoryNotice'
+import { downscaleServiceImage } from '../downscale-service-image'
 import type { ServicePage, ServicePageFormData, ServicePageFormPayload } from '../types'
 
 const ACCEPTED_IMAGE_TYPES = 'image/jpeg,image/png,image/webp,image/gif'
@@ -390,54 +391,69 @@ export function ServiceForm({
     return form.getValues('backgroundImageUrl') ?? undefined
   }
 
-  function handleBgFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleBgFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
+    e.target.value = ''
     if (!file) return
-    if (file.size > MAX_FILE_SIZE_BYTES) {
+
+    const prepared = await downscaleServiceImage(file)
+    if (prepared.size > MAX_FILE_SIZE_BYTES) {
       form.setError('backgroundImageUrl', { message: 'Arquivo excede o limite de 4 MB.' })
-      e.target.value = ''
       return
     }
-    bgFileRef.current = file
+
+    bgFileRef.current = prepared
     if (bgPreview?.startsWith('blob:')) URL.revokeObjectURL(bgPreview)
-    setBgPreview(URL.createObjectURL(file))
+    setBgPreview(URL.createObjectURL(prepared))
     form.clearErrors('backgroundImageUrl')
     form.setValue('backgroundImageUrl', '', { shouldDirty: true })
-    e.target.value = ''
   }
 
-  function handleGalleryAdd(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleGalleryAdd(e: React.ChangeEvent<HTMLInputElement>) {
     const fileList = e.target.files
     if (!fileList) return
+    const selected = Array.from(fileList)
+    e.target.value = ''
 
     const validFiles: File[] = []
-    for (const file of Array.from(fileList)) {
+    let rejected = false
+    for (const file of selected) {
       if (fields.length + validFiles.length >= 15) break
-      if (file.size > MAX_FILE_SIZE_BYTES) continue
-      validFiles.push(file)
+      const prepared = await downscaleServiceImage(file)
+      if (prepared.size > MAX_FILE_SIZE_BYTES) {
+        rejected = true
+        continue
+      }
+      validFiles.push(prepared)
     }
 
-    if (validFiles.length === 0) {
-      e.target.value = ''
-      return
+    if (rejected) {
+      form.setError('images', { message: 'Uma imagem continua acima de 4 MB depois da redução.' })
+    } else {
+      form.clearErrors('images')
     }
+
+    if (validFiles.length === 0) return
 
     pendingFilesRef.current.push(...validFiles)
     validFiles.forEach(() => {
       append({ imgUrl: '', alt: '' })
     })
-
-    e.target.value = ''
   }
 
-  function handleGalleryReplace(fieldId: string, file: File) {
-    if (file.size > MAX_FILE_SIZE_BYTES) return
-    galleryFilesRef.current.set(fieldId, file)
+  async function handleGalleryReplace(fieldId: string, file: File) {
+    const prepared = await downscaleServiceImage(file)
+    if (prepared.size > MAX_FILE_SIZE_BYTES) {
+      form.setError('images', { message: 'Uma imagem continua acima de 4 MB depois da redução.' })
+      return
+    }
+    galleryFilesRef.current.set(fieldId, prepared)
+    form.clearErrors('images')
     const oldPreview = galleryPreviews.get(fieldId)
     if (oldPreview?.startsWith('blob:')) URL.revokeObjectURL(oldPreview)
     setGalleryPreviews((prev) => {
       const next = new Map(prev)
-      next.set(fieldId, URL.createObjectURL(file))
+      next.set(fieldId, URL.createObjectURL(prepared))
       return next
     })
     const index = fields.findIndex((f) => f.id === fieldId)
@@ -712,7 +728,7 @@ export function ServiceForm({
                 ) : null}
               </div>
               <FormDescription>
-                JPEG, PNG, WebP ou GIF. Máximo 4 MB.
+                JPEG, PNG, WebP ou GIF. Fotos grandes são reduzidas antes do envio.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -753,8 +769,11 @@ export function ServiceForm({
               <p className="text-sm font-medium">Galeria de imagens</p>
               <p className="text-xs text-muted-foreground">
                 De 1 a 15 imagens. Arraste para reorganizar. Cada foto precisa
-                de um texto alternativo.
+                de um texto alternativo. Fotos grandes são reduzidas antes do envio.
               </p>
+              {form.formState.errors.images?.message ? (
+                <p className="text-sm text-destructive">{form.formState.errors.images.message}</p>
+              ) : null}
             </div>
 
             <input
