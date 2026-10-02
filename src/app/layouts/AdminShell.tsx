@@ -229,6 +229,7 @@ function PageTitle() {
   if (path === '/conteudo/documentos') return 'Documentos'
   if (path.startsWith('/conteudo')) return 'Conteúdos'
   if (path.startsWith('/moderacao/depoimentos')) return 'Depoimentos'
+  if (path.startsWith('/moderacao/trabalhe-conosco')) return 'Trabalhe conosco'
   if (path.startsWith('/moderacao')) return 'Moderação'
   if (path.startsWith('/usuarios')) return 'Usuários'
   if (path.startsWith('/perfil')) return 'Meu perfil'

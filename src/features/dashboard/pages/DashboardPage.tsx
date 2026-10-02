@@ -5,6 +5,7 @@ import {
   FileDown,
   GlobeIcon,
   Image,
+  Briefcase,
   Inbox,
   MessageSquareQuote,
   Newspaper,
@@ -31,6 +32,12 @@ const quickLinks = [
     label: 'Contatos',
     description: 'Responder pedidos enviados pela landing.',
     icon: Inbox,
+  },
+  {
+    to: '/moderacao/trabalhe-conosco' as const,
+    label: 'Trabalhe conosco',
+    description: 'Ver cadastros do banco de talentos.',
+    icon: Briefcase,
   },
   {
     to: '/moderacao/depoimentos' as const,

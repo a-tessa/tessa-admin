@@ -142,6 +142,11 @@ export const navigationItems = [
         icon: 'inbox',
       },
       {
+        to: '/moderacao/trabalhe-conosco',
+        label: 'Trabalhe conosco',
+        icon: 'briefcase',
+      },
+      {
         to: '/moderacao/depoimentos',
         label: 'Depoimentos',
         icon: 'message-square-quote',

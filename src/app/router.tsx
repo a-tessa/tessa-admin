@@ -33,6 +33,7 @@ import { ScenerySectionPage } from '@/features/content/scenery/pages/ScenerySect
 import { ServicesPage } from '@/features/content/services/pages/ServicesPage'
 import { DashboardPage } from '@/features/dashboard/pages/DashboardPage'
 import { ContactsPage } from '@/features/moderation/contacts/pages/ContactsPage'
+import { TalentApplicationsPage } from '@/features/moderation/talent-applications/pages/TalentApplicationsPage'
 import { TestimonialsPage } from '@/features/moderation/testimonials/pages/TestimonialsPage'
 import { ProfilePage } from '@/features/profile/pages/ProfilePage'
 import { UsersPage } from '@/features/users/pages/UsersPage'
@@ -234,6 +235,12 @@ const moderationContactsRoute = createRoute({
   component: ContactsPage,
 })
 
+const moderationTalentApplicationsRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: 'moderacao/trabalhe-conosco',
+  component: TalentApplicationsPage,
+})
+
 const moderationContactNotificationsRoute = createRoute({
   getParentRoute: () => appRoute,
   path: 'moderacao/notificacoes',
@@ -287,6 +294,7 @@ export const routeTree = rootRoute.addChildren([
     contentBlogEditRoute,
     contentEditRoute,
     moderationContactsRoute,
+    moderationTalentApplicationsRoute,
     moderationContactNotificationsRoute,
     moderationTestimonialsRoute,
     usersRoute,
